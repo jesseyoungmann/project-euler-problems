@@ -1,13 +1,213 @@
+extern crate num;
+
+use num::bigint::BigUint;
+use num::bigint::ToBigUint;
+use num::ToPrimitive;
+
 fn main() {
   run_all();
-  //problem_11();
+  println!("Great work, team!");
 }
+
 #[allow(dead_code)]
 
-fn problem_11() -> i32 {
-  let result = 0;
+fn problem_16() -> u64 {
+  let num = num::pow::pow(BigUint::new(vec![2]),1000);
+  digits(num).into_iter().map( |x| x as u64 ).sum()
+}
 
-  println!("Problem 11: {:?}", result);
+fn digits(mut num : BigUint) -> Vec<i8> {
+  if num == 0.to_biguint().unwrap() {
+    return vec![0]
+  }
+
+  let mut digits : Vec<i8> = Vec::new();
+
+  while num > 0.to_biguint().unwrap() {
+    digits.push((&num % 10.to_biguint().unwrap()).to_i8().unwrap());
+    num = num / 10.to_biguint().unwrap();
+  }
+
+  digits
+}
+
+fn problem_15() -> u64 {
+  let width = 21;
+
+  let mut memo : Vec<u64> = vec![0;width * width];
+
+  for x in 0..width {
+    memo[x] = 1;
+  }
+
+  for y in 0..width {
+    memo[y * width] = 1;
+  }
+
+  for y in 1..width {
+    for x in 1..width {
+      memo[y * width + x] = memo[y * width + x - 1] + memo[(y - 1) * width + x];
+    }
+  }
+
+  memo[width * width - 1]
+}
+
+fn problem_14() -> u32 {
+  fn collatz_length(num: usize, memo: &mut [u32]) -> u32 {
+    if num < 2_000_000 && memo[num] != 0 {
+      memo[num]
+    } else {
+      let next = if num % 2 == 0 {
+        num / 2
+      } else {
+        3 * num + 1
+      };
+      let next_count = collatz_length(next, memo) + 1;
+      if num < 2_000_000 {
+        memo[num] = next_count;
+      }
+      next_count
+    }
+  }
+
+  let mut memo : Vec<u32> = vec![0;2_000_000];
+
+  memo[1] = 1;
+
+  let mut biggest : u32 = 0;
+  let mut biggest_count : u32 = 0;
+
+  for num in 2_usize..1_000_000 {
+    let num_count = collatz_length(num,&mut memo);
+    if num_count > biggest_count {
+      biggest = num as u32;
+      biggest_count = num_count;
+    }
+  }
+
+  biggest
+}
+
+// The trick was recognizing, if you only need the first ten digits,
+// chop off all digits that are too far away to change the ten
+// with 100 numbers (12 digits probably? I did 14)
+fn problem_13() -> u64 {
+  let nums : [u64;100] = [
+    3710728753390, 4637693767749, 7432498619952, 9194221336357, 2306758820753,
+    8926167069662, 2811287981284, 4427422891743, 4745144573600, 7038648610584,
+    6217645714185, 6490635246274, 9257586771833, 5820356532535, 8018119938482,
+    3539866437282, 8651550600629, 7169388870771, 5437007057682, 5328265410875,
+    3612327252500, 4587657617241, 1742370690585, 8114266041808, 5193432545172,
+    6246722164843, 1573244438690, 5503768752567, 1833638482533, 8038628759287,
+    7818283375799, 1672632010043, 4840309812907, 8708698755139, 5995940689575,
+    6979395067965, 4105268470829, 6537860736150, 3582903531743, 9495375976510,
+    8890280257173, 2526768027607, 3627021854049, 2407448690823, 9143028819710,
+    3441306557801, 2305308117281, 1148769693215, 6378329949063, 6772018697169,
+    9554825530026, 7608532713228, 3777424253541, 2370191327572, 2979886027225,
+    1849570145487, 3829820378303, 3482954382919, 4095795306640, 2974615218550,
+    4169811622207, 6246795719440, 2318970677254, 8618808822587, 1130673970830,
+    8295917476714, 9762333104481, 4284628018351, 5512160354698, 3223819573432,
+    7550616496518, 6217784275219, 3292418570714, 9951867143023, 7326746080059,
+    7684182252467, 9714261791034, 8778364618279, 1084880252167, 7132961247478,
+    6218407357239, 6662789198148, 6066182629368, 8578694408955, 6602439640990,
+    6491398268003, 1673093931987, 9480937724504, 7863916702118, 1536871371193,
+    4078992311553, 4488991150144, 4150312888033, 8123488067321, 8261657077394,
+    2291880205877, 7715854250201, 7210783843506, 2084960398013, 5350353422647
+      ];
+
+  let result : u64 = nums.iter().sum::<u64>() / 100000;
+
+  result
+}
+
+fn problem_12() -> i32 {
+  let mut num = 1;
+  let mut i = 2;
+
+  loop {
+    num += i;
+
+    if num_divisors(num) > 500 {
+      break;
+    }
+
+    i += 1;
+  }
+
+  num
+}
+
+fn num_divisors(num:i32) -> i32 {
+  let mut num_divisors = 2;
+  let max = (num as f64).sqrt() as i32;
+  for j in 2..max+1 {
+    if num % j == 0 {
+      if num == max {
+        num_divisors += 1;
+      } else {
+        num_divisors += 2;
+      }
+    }
+  }
+  num_divisors
+}
+
+fn problem_11() -> i32 {
+  let grid : [[ i32; 20]; 20] = [
+    [08,02,22,97,38,15,00,40,00,75,04,05,07,78,52,12,50,77,91,08],
+    [49,49,99,40,17,81,18,57,60,87,17,40,98,43,69,48,04,56,62,00],
+    [81,49,31,73,55,79,14,29,93,71,40,67,53,88,30,03,49,13,36,65],
+    [52,70,95,23,04,60,11,42,69,24,68,56,01,32,56,71,37,02,36,91],
+    [22,31,16,71,51,67,63,89,41,92,36,54,22,40,40,28,66,33,13,80],
+    [24,47,32,60,99,03,45,02,44,75,33,53,78,36,84,20,35,17,12,50],
+    [32,98,81,28,64,23,67,10,26,38,40,67,59,54,70,66,18,38,64,70],
+    [67,26,20,68,02,62,12,20,95,63,94,39,63,08,40,91,66,49,94,21],
+    [24,55,58,05,66,73,99,26,97,17,78,78,96,83,14,88,34,89,63,72],
+    [21,36,23,09,75,00,76,44,20,45,35,14,00,61,33,97,34,31,33,95],
+    [78,17,53,28,22,75,31,67,15,94,03,80,04,62,16,14,09,53,56,92],
+    [16,39,05,42,96,35,31,47,55,58,88,24,00,17,54,24,36,29,85,57],
+    [86,56,00,48,35,71,89,07,05,44,44,37,44,60,21,58,51,54,17,58],
+    [19,80,81,68,05,94,47,69,28,73,92,13,86,52,17,77,04,89,55,40],
+    [04,52,08,83,97,35,99,16,07,97,57,32,16,26,26,79,33,27,98,66],
+    [88,36,68,87,57,62,20,72,03,46,33,67,46,55,12,32,63,93,53,69],
+    [04,42,16,73,38,25,39,11,24,94,72,18,08,46,29,32,40,62,76,36],
+    [20,69,36,41,72,30,23,88,34,62,99,69,82,67,59,85,74,04,36,16],
+    [20,73,35,29,78,31,90,01,74,31,49,71,48,86,81,16,23,57,05,54],
+    [01,70,54,71,83,51,54,69,16,92,33,48,61,43,52,01,89,19,67,48],
+    ];
+
+  let mut result = 0;
+
+  for y in 0..20 {
+    for x in 0..20 {
+      if x < 17 && y < 17 {
+        result = std::cmp::max(
+          result,
+          grid[y][x] * grid[y+1][x+1] * grid[y+2][x+2] * grid[y+3][x+3]
+          )
+      }
+      if x > 2 && y < 17 {
+        result = std::cmp::max(
+          result,
+          grid[y][x] * grid[y+1][x-1] * grid[y+2][x-2] * grid[y+3][x-3]
+          )
+      }
+      if x < 17 {
+        result = std::cmp::max(
+          result,
+          grid[y][x] * grid[y][x+1] * grid[y][x+2] * grid[y][x+3]
+          )
+      }
+      if y < 17 {
+        result = std::cmp::max(
+          result,
+          grid[y][x] * grid[y+1][x] * grid[y+2][x] * grid[y+3][x]
+          )
+      }
+    }
+  }
+
   result
 }
 
@@ -292,62 +492,47 @@ fn problem_1() -> i32 {
   sum
 }
 
-
+const ANSWERS : [i64;101] = [ 0
+, 233168 , 4613732 , 6857 , 906609 , 232792560
+, 25164150 , 104743 , 23514624000 , 31875000 , 142913828922
+, 70600674 , 76576500 , 5537376230 , 837799 , 137846528820
+, 1366 , 21124 , 1074 , 171 , 648
+, 31626 , 871198282 , 4179871 , 2783915460 , 4782
+, 983 , -59231 , 669171001 , 9183 , 443839
+, 73682 , 45228 , 100 , 40730 , 55
+, 872187 , 748317 , 932718654 , 840 , 210
+, 7652413 , 162 , 16695334890 , 5482660 , 1533776805
+, 5777 , 134043 , 9110846700 , 296962999629 , 997651
+, 121313 , 142857 , 4075 , 376 , 249 , 972
+, 153 , 26241 , 107359 , 26033 , 28684
+, 127035954683 , 49 , 1322 , 272 , 661
+, 7273 , 6531031914842725 , 510510 , 8319823 , 428570
+, 303963552391 , 7295372 , 402 , 161667 , 190569291
+, 71 , 55374 , 73162890 , 40886 , 427337
+, 260324 , 425185 , 101524 , 2772 , 1818
+, 1097343 , 7587457 , 743 , 1217 , 14234
+, 8581146 , 1258 , 518408346 , 14316 , 24702
+, 8739992577 , 18769 , 709 , 756872327473
+];
 
 #[allow(dead_code)]
 fn run_all() {
 
-  assert_eq!(problem_1(), 233168);
-  assert_eq!(problem_2(), 4613732);
-  assert_eq!(problem_3(), 6857);
-  assert_eq!(problem_4(), 906609);
-  assert_eq!(problem_5(), 232792560);
-  assert_eq!(problem_6(), 25164150);
-  assert_eq!(problem_7(), 104743);
-  assert_eq!(problem_8(), 23514624000);
-  assert_eq!(problem_9(), 31875000);
-  assert_eq!(problem_10(), 142913828922);
-  /*
-  assert_eq!(problem_11(), 70600674);
-  assert_eq!(problem_12(), 76576500);
-  assert_eq!(problem_13(), 5537376230);
-  assert_eq!(problem_14(), 837799);
-  assert_eq!(problem_15(), 137846528820);
-  assert_eq!(problem_16(), 1366);
-  assert_eq!(problem_17(), 21124);
-  assert_eq!(problem_18(), 1074);
-  assert_eq!(problem_19(), 171);
-  assert_eq!(problem_20(), 648);
-  assert_eq!(problem_21(), 31626);
-  assert_eq!(problem_22(), 871198282);
-  assert_eq!(problem_23(), 4179871);
-  assert_eq!(problem_24(), 2783915460);
-  assert_eq!(problem_25(), 4782);
-  assert_eq!(problem_26(), 983);
-  assert_eq!(problem_27(), -59231);
-  assert_eq!(problem_28(), 669171001);
-  assert_eq!(problem_29(), 9183);
-  assert_eq!(problem_30(), 443839);
-  assert_eq!(problem_31(), 73682);
-  assert_eq!(problem_32(), 45228);
-  assert_eq!(problem_33(), 100);
-  assert_eq!(problem_34(), 40730);
-  assert_eq!(problem_35(), 55);
-  assert_eq!(problem_36(), 872187);
-  assert_eq!(problem_37(), 748317);
-  assert_eq!(problem_38(), 932718654);
-  assert_eq!(problem_39(), 840);
-  assert_eq!(problem_40(), 210);
-  assert_eq!(problem_41(), 7652413);
-  assert_eq!(problem_42(), 162);
-  assert_eq!(problem_43(), 16695334890);
-  assert_eq!(problem_44(), 5482660);
-  assert_eq!(problem_45(), 1533776805);
-  assert_eq!(problem_46(), 5777);
-  assert_eq!(problem_47(), 134043);
-  assert_eq!(problem_48(), 9110846700);
-  assert_eq!(problem_49(), 296962999629);
-  assert_eq!(problem_50(), 997651);
-  */
+  assert!(problem_1() == ANSWERS[1] as i32);
+  assert!(problem_2() == ANSWERS[2] as i32);
+  assert!(problem_3() == ANSWERS[3]);
+  assert!(problem_4() == ANSWERS[4]);
+  assert!(problem_5() == ANSWERS[5] as u64);
+  assert!(problem_6() == ANSWERS[6] as u64);
+  assert!(problem_7() == ANSWERS[7]);
+  assert!(problem_8() == ANSWERS[8] as u64);
+  assert!(problem_9() == ANSWERS[9] as u64);
+  assert!(problem_10() == ANSWERS[10]);
+  assert!(problem_11() == ANSWERS[11] as i32);
+  assert!(problem_12() == ANSWERS[12] as i32);
+  assert!(problem_13() == ANSWERS[13] as u64);
+  assert!(problem_14() == ANSWERS[14] as u32);
+  assert!(problem_15() == ANSWERS[15] as u64);
+  assert!(problem_16() == ANSWERS[16] as u64);
 
 }
