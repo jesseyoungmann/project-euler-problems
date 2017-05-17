@@ -1,13 +1,96 @@
 fn main() {
-  problem_5();
+  problem_10();
 }
+
+#[allow(dead_code)]
+fn problem_10() {
+  let result = Primes::new().take_while( |&x| x < 2_000_000 ).sum::<i64>() + 2;
+
+  println!("Problem 10: {:?}", result);
+}
+
+// - - - - - - - - - - - - - - - - - - - -
+
+#[allow(dead_code)]
+fn problem_9() {
+  let mut result = 0;
+
+  'outer: for c in 333_u64..997 {
+    for b in 2..c {
+      let a = 1000 - b - c;
+      if a.pow(2) + b.pow(2) == c.pow(2) {
+        result = a * b * c;
+        break 'outer;
+      }
+    }
+  }
+
+  println!("Problem 9: {:?}", result);
+}
+
+// - - - - - - - - - - - - - - - - - - - -
+
+#[allow(dead_code)]
+fn problem_8() {
+  let s = String::from("
+    73167176531330624919225119674426574742355349194934
+    96983520312774506326239578318016984801869478851843
+    85861560789112949495459501737958331952853208805511
+    12540698747158523863050715693290963295227443043557
+    66896648950445244523161731856403098711121722383113
+    62229893423380308135336276614282806444486645238749
+    30358907296290491560440772390713810515859307960866
+    70172427121883998797908792274921901699720888093776
+    65727333001053367881220235421809751254540594752243
+    52584907711670556013604839586446706324415722155397
+    53697817977846174064955149290862569321978468622482
+    83972241375657056057490261407972968652414535100474
+    82166370484403199890008895243450658541227588666881
+    16427171479924442928230863465674813919123162824586
+    17866458359124566529476545682848912883142607690042
+    24219022671055626321111109370544217506941658960408
+    07198403850962455444362981230987879927244284909188
+    84580156166097919133875499200524063689912560717606
+    05886116467109405077541002256983155200055935729725
+    71636269561882670428252483600823257530420752963450
+    ").replace(" ","").replace("\n","");
+
+  let mut result : u64 = 0;
+
+  for i in 0..s.len()-12 {
+    let substring = &s[i..i+13];
+    let product : u64 = substring.chars().map( |c| c.to_digit(10).unwrap() as u64 ).product();
+    result = std::cmp::max(result,product);
+  }
+
+  println!("Problem 8: {:?}", result);
+}
+// - - - - - - - - - - - - - - - - - - - -
+
+#[allow(dead_code)]
+fn problem_7() {
+
+  let result = Primes::new().nth(9_999).expect("Infinite, shouldn't fail to find");
+
+  println!("Problem 7: {:?}", result);
+}
+
+// - - - - - - - - - - - - - - - - - - - -
+
+#[allow(dead_code)]
+fn problem_6() {
+  let result = (1_u64..101_u64).fold(0,|acc,x| acc + x).pow(2) - (1_u64..101_u64).fold(0,|acc,x| acc + x.pow(2));
+
+  println!("Problem 6: {:?}", result);
+}
+
+// - - - - - - - - - - - - - - - - - - - -
 
 #[allow(dead_code)]
 fn problem_5() {
   // Get unique prime factors, number has to be a multiple of the product of all of them,
   // so step by it
   let step : u64 = Primes::new().take_while( |&x| x < 21 ).fold(2_u64, |acc,x| (x as u64) * acc );
-  println!("Step: {:?}", step);
 
   //let nums : Vec<_> = (2..21).filter( |&x| (x+1..21).filter(|&y| y % x == 0 ).collect::<Vec<_>>().len() == 0 ).rev().collect();
 
@@ -28,8 +111,10 @@ fn problem_5() {
     break;
   }
 
-  println!("Problem 4: {:?}", result);
+  println!("Problem 5: {:?}", result);
 }
+
+// - - - - - - - - - - - - - - - - - - - -
 
 #[allow(dead_code)]
 fn problem_4() {
