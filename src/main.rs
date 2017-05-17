@@ -1,18 +1,28 @@
 fn main() {
-  problem_10();
+  run_all();
+  //problem_10();
 }
 
 #[allow(dead_code)]
-fn problem_10() {
-  let result = Primes::new().take_while( |&x| x < 2_000_000 ).sum::<i64>() + 2;
+fn problem_11() -> i32 {
+  let result = 0;
 
   println!("Problem 10: {:?}", result);
+  result
+}
+
+
+#[allow(dead_code)]
+fn problem_10() -> i64 {
+  let result = Primes::new().take_while( |&x| x < 2_000_000 ).sum::<i64>() + 2;
+
+  result
 }
 
 // - - - - - - - - - - - - - - - - - - - -
 
 #[allow(dead_code)]
-fn problem_9() {
+fn problem_9() -> u64 {
   let mut result = 0;
 
   'outer: for c in 333_u64..997 {
@@ -25,13 +35,13 @@ fn problem_9() {
     }
   }
 
-  println!("Problem 9: {:?}", result);
+  result
 }
 
 // - - - - - - - - - - - - - - - - - - - -
 
 #[allow(dead_code)]
-fn problem_8() {
+fn problem_8() -> u64 {
   let s = String::from("
     73167176531330624919225119674426574742355349194934
     96983520312774506326239578318016984801869478851843
@@ -63,31 +73,31 @@ fn problem_8() {
     result = std::cmp::max(result,product);
   }
 
-  println!("Problem 8: {:?}", result);
+  result
 }
 // - - - - - - - - - - - - - - - - - - - -
 
 #[allow(dead_code)]
-fn problem_7() {
+fn problem_7() -> i64 {
 
   let result = Primes::new().nth(9_999).expect("Infinite, shouldn't fail to find");
 
-  println!("Problem 7: {:?}", result);
+  result
 }
 
 // - - - - - - - - - - - - - - - - - - - -
 
 #[allow(dead_code)]
-fn problem_6() {
+fn problem_6() -> u64 {
   let result = (1_u64..101_u64).fold(0,|acc,x| acc + x).pow(2) - (1_u64..101_u64).fold(0,|acc,x| acc + x.pow(2));
 
-  println!("Problem 6: {:?}", result);
+  result
 }
 
 // - - - - - - - - - - - - - - - - - - - -
 
 #[allow(dead_code)]
-fn problem_5() {
+fn problem_5() -> u64 {
   // Get unique prime factors, number has to be a multiple of the product of all of them,
   // so step by it
   let step : u64 = Primes::new().take_while( |&x| x < 21 ).fold(2_u64, |acc,x| (x as u64) * acc );
@@ -111,13 +121,13 @@ fn problem_5() {
     break;
   }
 
-  println!("Problem 5: {:?}", result);
+  result
 }
 
 // - - - - - - - - - - - - - - - - - - - -
 
 #[allow(dead_code)]
-fn problem_4() {
+fn problem_4() -> i64 {
   let mut result = 0;
 
   for i in 1..1000 {
@@ -129,7 +139,7 @@ fn problem_4() {
     }
   }
 
-  println!("Problem 4: {}", result);
+  result
 }
 
 fn digit_at(num:i64,index:u32) -> u32 {
@@ -158,7 +168,7 @@ fn number_is_palindrome(num:i64) -> bool {
 // - - - - - - - - - - - - - - - - - - - -
 
 #[allow(dead_code)]
-fn problem_3() {
+fn problem_3() -> i64 {
   let mut max : i64 = 600851475143;
 
   let primes = Primes::new();
@@ -177,7 +187,7 @@ fn problem_3() {
     }
   }
 
-  println!("Problem 3: {}", result);
+  result
 }
 
 struct Primes {
@@ -201,7 +211,7 @@ impl Primes {
         return false;
       }
     }
-    return true;
+    true
   }
 }
 
@@ -228,7 +238,7 @@ impl Iterator for Primes {
 // - - - - - - - - - - - - - - - - - - - -
 
 #[allow(dead_code)]
-fn problem_2() {
+fn problem_2() -> i32 {
 
   let fib = Fibonacci::new();
 
@@ -243,7 +253,7 @@ fn problem_2() {
     }
   }
 
-  println!("Problem 2: {}", result);
+  result
 }
 
 struct Fibonacci {
@@ -274,7 +284,7 @@ impl Iterator for Fibonacci {
 // - - - - - - - - - - - - - - - - - - - -
 
 #[allow(dead_code)]
-fn problem_1() {
+fn problem_1() -> i32 {
   let mut sum = 0;
 
   for i in 1..1000 {
@@ -283,5 +293,64 @@ fn problem_1() {
     }
   }
 
-  println!("Problem 1: {}", sum);
+  sum
+}
+
+
+
+fn run_all() {
+
+  assert_eq!(problem_1(), 233168);
+  assert_eq!(problem_2(), 4613732);
+  assert_eq!(problem_3(), 6857);
+  assert_eq!(problem_4(), 906609);
+  assert_eq!(problem_5(), 232792560);
+  assert_eq!(problem_6(), 25164150);
+  assert_eq!(problem_7(), 104743);
+  assert_eq!(problem_8(), 23514624000);
+  assert_eq!(problem_9(), 31875000);
+  assert_eq!(problem_10(), 142913828922);
+  /*
+  assert_eq!(problem_11(), 70600674);
+  assert_eq!(problem_12(), 76576500);
+  assert_eq!(problem_13(), 5537376230);
+  assert_eq!(problem_14(), 837799);
+  assert_eq!(problem_15(), 137846528820);
+  assert_eq!(problem_16(), 1366);
+  assert_eq!(problem_17(), 21124);
+  assert_eq!(problem_18(), 1074);
+  assert_eq!(problem_19(), 171);
+  assert_eq!(problem_20(), 648);
+  assert_eq!(problem_21(), 31626);
+  assert_eq!(problem_22(), 871198282);
+  assert_eq!(problem_23(), 4179871);
+  assert_eq!(problem_24(), 2783915460);
+  assert_eq!(problem_25(), 4782);
+  assert_eq!(problem_26(), 983);
+  assert_eq!(problem_27(), -59231);
+  assert_eq!(problem_28(), 669171001);
+  assert_eq!(problem_29(), 9183);
+  assert_eq!(problem_30(), 443839);
+  assert_eq!(problem_31(), 73682);
+  assert_eq!(problem_32(), 45228);
+  assert_eq!(problem_33(), 100);
+  assert_eq!(problem_34(), 40730);
+  assert_eq!(problem_35(), 55);
+  assert_eq!(problem_36(), 872187);
+  assert_eq!(problem_37(), 748317);
+  assert_eq!(problem_38(), 932718654);
+  assert_eq!(problem_39(), 840);
+  assert_eq!(problem_40(), 210);
+  assert_eq!(problem_41(), 7652413);
+  assert_eq!(problem_42(), 162);
+  assert_eq!(problem_43(), 16695334890);
+  assert_eq!(problem_44(), 5482660);
+  assert_eq!(problem_45(), 1533776805);
+  assert_eq!(problem_46(), 5777);
+  assert_eq!(problem_47(), 134043);
+  assert_eq!(problem_48(), 9110846700);
+  assert_eq!(problem_49(), 296962999629);
+  assert_eq!(problem_50(), 997651);
+  */
+
 }
