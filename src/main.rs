@@ -1,27 +1,25 @@
 fn main() {
   run_all();
-  //problem_10();
+  //problem_11();
 }
-
 #[allow(dead_code)]
+
 fn problem_11() -> i32 {
   let result = 0;
 
-  println!("Problem 10: {:?}", result);
+  println!("Problem 11: {:?}", result);
   result
 }
 
 
-#[allow(dead_code)]
 fn problem_10() -> i64 {
-  let result = Primes::new().take_while( |&x| x < 2_000_000 ).sum::<i64>() + 2;
+  let result : i64 = Primes::new().take_while( |&x| x < 2_000_000 ).sum();
 
   result
 }
 
 // - - - - - - - - - - - - - - - - - - - -
 
-#[allow(dead_code)]
 fn problem_9() -> u64 {
   let mut result = 0;
 
@@ -40,7 +38,6 @@ fn problem_9() -> u64 {
 
 // - - - - - - - - - - - - - - - - - - - -
 
-#[allow(dead_code)]
 fn problem_8() -> u64 {
   let s = String::from("
     73167176531330624919225119674426574742355349194934
@@ -77,17 +74,15 @@ fn problem_8() -> u64 {
 }
 // - - - - - - - - - - - - - - - - - - - -
 
-#[allow(dead_code)]
 fn problem_7() -> i64 {
 
-  let result = Primes::new().nth(9_999).expect("Infinite, shouldn't fail to find");
+  let result = Primes::new().nth(10_000).expect("Infinite, shouldn't fail to find");
 
   result
 }
 
 // - - - - - - - - - - - - - - - - - - - -
 
-#[allow(dead_code)]
 fn problem_6() -> u64 {
   let result = (1_u64..101_u64).fold(0,|acc,x| acc + x).pow(2) - (1_u64..101_u64).fold(0,|acc,x| acc + x.pow(2));
 
@@ -96,13 +91,12 @@ fn problem_6() -> u64 {
 
 // - - - - - - - - - - - - - - - - - - - -
 
-#[allow(dead_code)]
 fn problem_5() -> u64 {
   // Get unique prime factors, number has to be a multiple of the product of all of them,
   // so step by it
-  let step : u64 = Primes::new().take_while( |&x| x < 21 ).fold(2_u64, |acc,x| (x as u64) * acc );
+  let step : u64 = Primes::new().take_while( |&x| x < 21 ).product::<i64>() as u64;
 
-  //let nums : Vec<_> = (2..21).filter( |&x| (x+1..21).filter(|&y| y % x == 0 ).collect::<Vec<_>>().len() == 0 ).rev().collect();
+  // let nums : Vec<_> = (2..21).filter( |&x| (x+1..21).filter(|&y| y % x == 0 ).collect::<Vec<_>>().len() == 0 ).rev().collect();
 
   // We can skip checking if a result is divisible by numbers that are divisors of the larger numbers
   // sorting by reverse should opt out of loop earlier
@@ -126,7 +120,6 @@ fn problem_5() -> u64 {
 
 // - - - - - - - - - - - - - - - - - - - -
 
-#[allow(dead_code)]
 fn problem_4() -> i64 {
   let mut result = 0;
 
@@ -167,7 +160,6 @@ fn number_is_palindrome(num:i64) -> bool {
 
 // - - - - - - - - - - - - - - - - - - - -
 
-#[allow(dead_code)]
 fn problem_3() -> i64 {
   let mut max : i64 = 600851475143;
 
@@ -191,23 +183,23 @@ fn problem_3() -> i64 {
 }
 
 struct Primes {
-  testing: i64,
+  test_next: i64,
   found_primes: Vec<i64>
 }
 
 impl Primes {
   fn new() -> Primes {
-    Primes { testing: 1, found_primes: vec![] }
+    Primes { test_next: 2, found_primes: vec![] }
   }
 
-  fn is_prime(found_primes : &Vec<i64>, testing : i64) -> bool {
-    let max_prime = (testing as f64).sqrt() as i64;
+  fn is_prime(found_primes : &Vec<i64>, test_next : i64) -> bool {
+    let max_prime = (test_next as f64).sqrt() as i64;
 
     for &prime in found_primes {
       if prime > max_prime {
         break;
       }
-      if testing % prime == 0 {
+      if test_next % prime == 0 {
         return false;
       }
     }
@@ -218,26 +210,31 @@ impl Primes {
 impl Iterator for Primes {
   type Item = i64;
   fn next(&mut self) -> Option<Self::Item> {
-    self.testing += 2;
-
-    while !Primes::is_prime(&self.found_primes,self.testing) {
-      self.testing += 2;
+    if self.test_next == 2 {
+      self.test_next = 3;
+      return Some(2);
     }
 
-    self.found_primes.push(self.testing);
-
-    if self.testing > std::i64::MAX / 2 {
-      println!("Max Fibonacci!");
-      None
-    } else {
-      Some(self.testing)
+    while !Primes::is_prime(&self.found_primes,self.test_next) {
+      self.test_next += 2;
+      if self.test_next > std::i64::MAX / 2 {
+        println!("Max Fibonacci!");
+        return None
+      }
     }
+
+    let latest = self.test_next;
+
+    self.found_primes.push(latest);
+
+    self.test_next += 2;
+
+    Some(latest)
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - -
 
-#[allow(dead_code)]
 fn problem_2() -> i32 {
 
   let fib = Fibonacci::new();
@@ -283,7 +280,6 @@ impl Iterator for Fibonacci {
 
 // - - - - - - - - - - - - - - - - - - - -
 
-#[allow(dead_code)]
 fn problem_1() -> i32 {
   let mut sum = 0;
 
@@ -298,6 +294,7 @@ fn problem_1() -> i32 {
 
 
 
+#[allow(dead_code)]
 fn run_all() {
 
   assert_eq!(problem_1(), 233168);
