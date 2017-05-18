@@ -4,12 +4,138 @@ use num::bigint::BigUint;
 use num::bigint::ToBigUint;
 use num::ToPrimitive;
 
+// Files
+use std::fs::File;
+use std::io::prelude::*;
+
 fn main() {
-  run_all();
+  //run_all();
+  println!("Result: {}", problem_22());
+  //assert!(problem_22() == ANSWERS[22]);
   println!("Great work, team!");
 }
 
 #[allow(dead_code)]
+
+fn problem_22() -> i64 {
+    let mut f = File::open("assets/names.txt").expect("File not found!");
+
+    let mut file_text = String::new();
+    //let mut file_text = (r#""what is " going on ""#).to_string();
+
+    f.read_to_string(&mut file_text).expect("Something went wrong reading file!");
+
+    file_text = file_text.replace(r#"""#,"");
+
+    let mut strings = file_text.split(",").collect::<Vec<_>>();
+
+    strings.sort();
+
+    let mut sum = 0_i64;
+    for (index,s) in strings.iter().enumerate() {
+      let value : i64 = s.bytes().map(|b| (b - ('A' as u8) + 1) as i64 ).sum();
+      sum += value * (1 + (index as i64));
+    }
+
+    sum
+}
+
+fn problem_21() -> i64 {
+  fn sum_of_proper_divisors(num: usize) -> usize {
+    let mut sum = 1;
+    for i in 2..(num / 2 + (1 - num % 2)) {
+      if num % i == 0 {
+        sum += i;
+      }
+    }
+    sum
+  }
+
+  let mut memo : Vec<usize> = vec![0;10_000];
+
+  for i in 2_usize..10_000 {
+    memo[i] = sum_of_proper_divisors(i);
+  }
+
+  let mut result = 0;
+
+  for i in 2_usize..10_000 {
+    let other = memo[i];
+    if other >= 10_000 { continue; }
+
+    if other > i && memo[other] == i {
+      result += i + other;
+    }
+  }
+
+  result as i64
+}
+
+
+fn problem_20() -> i64 {
+  let big = (2..101)
+    .map( |x| x.to_biguint().unwrap() )
+    .fold(1.to_biguint().unwrap(), |acc,x| acc * x );
+
+  digits(big).into_iter().map( |x| x as i64 ).sum()
+}
+
+fn problem_19() -> i64 {
+  let mut day = 365_i64;
+  let mut result = 0;
+  let months : [i64;12] = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+  for year in 1901..2000 {
+    for &days in months.iter() {
+      if day % 7 == 0 {
+        result += 1;
+      }
+      day += days;
+      if days == 28 && year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) {
+        day += 1;
+      }
+    }
+  }
+
+  result
+}
+
+
+fn problem_18() -> i64 {
+  let mut triangle : Vec<Vec<u32>> = vec![
+    vec![75],
+    vec![95,64],
+    vec![17,47,82],
+    vec![18,35,87,10],
+    vec![20,04,82,47,65],
+    vec![19,01,23,75,03,34],
+    vec![88,02,77,73,07,63,67],
+    vec![99,65,04,28,06,16,70,92],
+    vec![41,41,26,56,83,40,80,70,33],
+    vec![41,48,72,33,47,32,37,16,94,29],
+    vec![53,71,44,65,25,43,91,52,97,51,14],
+    vec![70,11,33,28,77,73,17,78,39,68,17,57],
+    vec![91,71,52,38,17,14,91,43,58,50,27,29,48],
+    vec![63,66,04,68,89,53,67,30,73,16,69,87,40,31],
+    vec![04,62,98,27,23,09,70,98,73,93,38,53,60,04,23]];
+
+  triangle.reverse();
+
+  let mut max_totals : Vec<Vec<u32>> = vec![];
+
+  for (i,row) in triangle.iter().enumerate() {
+    let i = i as usize;
+    if i == 0 {
+      max_totals.push(row.clone());
+      continue;
+    }
+    let new_row = row.iter().enumerate().map( |(j,x)| { let j = j as usize; x + std::cmp::max(max_totals[i-1][j],max_totals[i-1][j+1]) } ).collect();
+    max_totals.push(new_row);
+  }
+  max_totals[max_totals.len()-1][0] as i64
+}
+
+// problem_17() sucks - char length of all numbers 1 to 1000 as words
 
 fn problem_16() -> u64 {
   let num = num::pow::pow(BigUint::new(vec![2]),1000);
@@ -534,5 +660,11 @@ fn run_all() {
   assert!(problem_14() == ANSWERS[14] as u32);
   assert!(problem_15() == ANSWERS[15] as u64);
   assert!(problem_16() == ANSWERS[16] as u64);
+
+  assert!(problem_18() == ANSWERS[18]);
+  assert!(problem_19() == ANSWERS[19]);
+  assert!(problem_20() == ANSWERS[20]);
+  assert!(problem_21() == ANSWERS[21]);
+  assert!(problem_22() == ANSWERS[22]);
 
 }
