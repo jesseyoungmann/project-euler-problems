@@ -9,15 +9,22 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  run_all();
+  //run_all();
   //println!("Result: {}", problem_23());
-  //assert!(problem_23() == ANSWERS[23]);
+  assert!(problem_23() == ANSWERS[23]);
   println!("Great work, team!");
 }
 
 #[allow(dead_code)]
 
+//fn problem_24() -> i64 {
+
+//}
+
 // Debug is 12 seconds vs 1.7 for release, wonder what's going on here?
+// looks like using binary search instead of a hashmap is not faster,
+// 16 seconds instead of 12
+// very similar time for release? or losing back some optimized time?
 fn problem_23() -> i64 {
   let limit = 28123 + 1;
   let mut abundant_numbers : Vec<usize> = Vec::new();
@@ -36,7 +43,7 @@ fn problem_23() -> i64 {
   'outer: for num in 25..limit {
     for &abundant in &abundant_numbers {
       // Only check if smaller, then break and add num
-      if abundant > (num - 12) {
+      if abundant > (num / 2 + 1) {
         break;
       }
 
