@@ -9,13 +9,67 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  //run_all();
-  println!("Result: {}", problem_22());
-  //assert!(problem_22() == ANSWERS[22]);
+  run_all();
+  //println!("Result: {}", problem_23());
+  //assert!(problem_23() == ANSWERS[23]);
   println!("Great work, team!");
 }
 
 #[allow(dead_code)]
+
+// Debug is 12 seconds vs 1.7 for release, wonder what's going on here?
+fn problem_23() -> i64 {
+  let limit = 28123 + 1;
+  let mut abundant_numbers : Vec<usize> = Vec::new();
+  let mut is_abundant : std::collections::HashMap<usize,bool> = std::collections::HashMap::new();
+
+  for i in 12..limit {
+    if sum_of_proper_divisors(i) > i {
+      abundant_numbers.push(i);
+      is_abundant.insert(i,true);
+    }
+  }
+
+  // We know all up to 24 are not sums of two abundant numbers
+  let mut result : usize = (1..24).sum();
+
+  'outer: for num in 25..limit {
+    for &abundant in &abundant_numbers {
+      // Only check if smaller, then break and add num
+      if abundant > (num - 12) {
+        break;
+      }
+
+      if is_abundant.get(&(num - abundant)) != None {
+        continue 'outer;
+      }
+    }
+    result += num;
+  }
+
+  result as i64
+}
+
+#[allow(dead_code)]
+fn proper_divisors(num : usize) -> Vec<usize> {
+  let mut result = Vec::new();
+  for i in 2..(num / 2 + ( 1 - num % 2 )) {
+    if num % i == 0 {
+      result.push(i);
+    }
+  }
+  result
+}
+
+fn sum_of_proper_divisors(num: usize) -> usize {
+  let mut sum = 1;
+  for i in 2..(num / 2 + (1 - num % 2)) {
+    if num % i == 0 {
+      sum += i;
+    }
+  }
+  sum
+}
 
 fn problem_22() -> i64 {
     let mut f = File::open("assets/names.txt").expect("File not found!");
@@ -41,15 +95,6 @@ fn problem_22() -> i64 {
 }
 
 fn problem_21() -> i64 {
-  fn sum_of_proper_divisors(num: usize) -> usize {
-    let mut sum = 1;
-    for i in 2..(num / 2 + (1 - num % 2)) {
-      if num % i == 0 {
-        sum += i;
-      }
-    }
-    sum
-  }
 
   let mut memo : Vec<usize> = vec![0;10_000];
 
@@ -666,5 +711,6 @@ fn run_all() {
   assert!(problem_20() == ANSWERS[20]);
   assert!(problem_21() == ANSWERS[21]);
   assert!(problem_22() == ANSWERS[22]);
+  assert!(problem_23() == ANSWERS[23]);
 
 }
