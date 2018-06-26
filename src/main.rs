@@ -9,17 +9,80 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  //run_all();
-  //println!("Result: {}", problem_23());
-  assert!(problem_23() == ANSWERS[23]);
+  run_all();
+  //println!("Result: {}", problem_25());
+  assert!(problem_25() == ANSWERS[25]);
   println!("Great work, team!");
 }
 
 #[allow(dead_code)]
 
-//fn problem_24() -> i64 {
 
-//}
+
+
+// Skip using BigUint by recording chopping off lowest digit
+// and recording number of chopped digits
+fn problem_25() -> i64 {
+  let mut i = 2;
+  let mut a = 1_u64;
+  let mut b = 1_u64;
+  let mut digits = 0_u64;
+  loop {
+    let mut current_digits = digits;
+    let mut current = b;
+    while current > 0 {
+      current /= 10;
+      current_digits += 1;
+    }
+
+    if current_digits >= 1000 {
+      break;
+    }
+
+    b += a;
+    a = b - a;
+
+    if b > std::u64::MAX / 2 {
+      a /= 10;
+      b /= 10;
+      digits += 1;
+    }
+
+    i += 1;
+  }
+  i
+}
+
+#[allow(dead_code)]
+fn problem_24() -> i64 {
+  20
+  //(0..10).permutation().get(1_000_000).expect()
+}
+
+/*
+struct Permutation<T : Clone> {
+  items: Vec<T>,
+  index: u64
+}
+
+impl<T : Clone> Permutation<T> {
+  fn new(items : Vec<T>) -> Permutation<T> {
+    Permutation { items: items, index: 0 }
+  }
+
+  fn max(&self) -> u64 {
+    (1_u64..(self.items.len() as u64 + 1)).product()
+  }
+}
+
+impl<'a,T> Iterator for Permutation<T> {
+  type Item = Vec<&'a T>;
+  fn next(&'a mut self) -> Option<Self::Item> {
+    let v = self.items.iter().collect();
+    Some(v)
+  }
+}
+*/
 
 // Debug is 12 seconds vs 1.7 for release, wonder what's going on here?
 // looks like using binary search instead of a hashmap is not faster,
@@ -47,7 +110,7 @@ fn problem_23() -> i64 {
         break;
       }
 
-      if is_abundant.get(&(num - abundant)) != None {
+      if let Some(_) = is_abundant.get(&(num - abundant)) {
         continue 'outer;
       }
     }
@@ -719,5 +782,7 @@ fn run_all() {
   assert!(problem_21() == ANSWERS[21]);
   assert!(problem_22() == ANSWERS[22]);
   assert!(problem_23() == ANSWERS[23]);
+
+  assert!(problem_25() == ANSWERS[25]);
 
 }
