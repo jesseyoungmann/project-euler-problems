@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 extern crate num;
 
 use num::bigint::BigUint;
@@ -10,42 +11,93 @@ use std::io::prelude::*;
 
 fn main() {
   //run_all();
-  println!("Result: {}", old_problem_29());
-  println!("Result: {}", problem_29());
-  //assert_eq!(problem_28(),ANSWERS[28]);
+  //println!("Result: {}", problem_29());
+  assert_eq!(problem_30(),ANSWERS[30]);
   println!("Great work, team!");
 }
 
 #[allow(dead_code)]
+fn problem_30() -> i64 {
+  println!("digits: {:?}",digits(1634));
+  fn sum_of_power_of_digits(n: i64, pow: u32) -> i64 {
+    digits(n).into_iter().map( |i| (i as i64).pow(pow) ).sum::<i64>()
+  }
+  //println!("{}",sum_of_power_of_digits(1634,4));
+  let mut result = 0;
+  // OKAY, WHAT'S THE INTUITION
+  // SIMPLEST IS 1 mil max, since 999_999 > (9 ** 5) * 6
+  // but 99_999 < (9 ** 5) * 5
+  // in ruby I calculated more, by decreasing from 1 mil, starting with the most sig digit,
+  // until it was smaller than the sum again (with max 9s below?)
+  // this runs in under a second, but what can I get it down to?
+
+  // codify process
+  /*
+  let mut max = 99;
+  let mut decimal = 10;
+  while max < sum_of_power_of_digits(max, 5) {
+    max = max * 10 + 9;
+    decimal *= 10;
+  }
+  loop {
+    if decimal < 10 { break; }
+    let next_max = max - decimal;
+    let x = sum_of_power_of_digits(next_max, 5);
+    if next_max == x {
+      max = next_max;
+      break;
+    }
+    if next_max > x {
+      max = next_max;
+    } else {
+      decimal = decimal / 10;
+    }
+  }
+  */
+  let max = 999_999;
+  println!("MAX: {}",max);
+  // WTF, CALCULATING BETTER MAX BARELY SAVES ANY TIME
+  // Okay, should I do the same thing, but iterate downwards from each max?
+
+  for n in 10..(max + 1) {
+    //whats the biggest it could possibly be? what numbers can we throw out?
+    // CAN PROBABLY USE A FIVE DIGIT ARRAY HERE? OR JUST DO THE LOOP OURSELVES? OR AN ITERATOR
+    if sum_of_power_of_digits(n,5) == n {
+      result += n;
+    }
+  }
+  result
+}
+
+fn digits(num: i64) -> Vec<i8> {
+  let mut num = num;
+  if num == 0 {
+    return vec![0]
+  }
+
+  let mut digits : Vec<i8> = Vec::new();
+
+  while num > 0 {
+    let rem = num % 10;
+    let quot = num / 10;
+    digits.push(rem as i8);
+    num = quot;
+  }
+
+  digits
+}
 
 // FUCK THIS: THE GOTCHA IS THAT MANY OF THE RESULTS ARE TOO LARGE
 // WORKS FINE IN RUBY CAUSE THEY'RE BIGINTS BY DEFAULT
-fn old_problem_29() -> i64 {
+fn problem_29() -> i64 {
   let mut results = vec!();
   for a in 2_i64..101 {
     for b in 2..101 {
       results.push(num::pow::pow(a.to_biguint().unwrap(),b));
     }
   }
-  //println!("{:?}",results);
   results.sort_unstable();
-  let mut c = 1;
-  for i in 0..results.len()-1 {
-    if results[i] != results[i+1] {
-      c += 1;
-    }
-  }
-  return c;
-}
-
-fn problem_29() -> i64 {
-  use std::collections::HashSet;
-  let mut results = HashSet::new();
-  for a in 2_i64..101 {
-    for b in 2..101 {
-      results.insert(a.pow(b));
-    }
-  }
+  results.dedup();
   results.len() as i64
 }
 
@@ -274,7 +326,7 @@ fn problem_20() -> i64 {
     .map( |x| x.to_biguint().unwrap() )
     .fold(1.to_biguint().unwrap(), |acc,x| acc * x );
 
-  digits(big).into_iter().map( |x| x as i64 ).sum()
+  biguint_digits(big).into_iter().map( |x| x as i64 ).sum()
 }
 
 fn problem_19() -> i64 {
@@ -336,10 +388,10 @@ fn problem_18() -> i64 {
 
 fn problem_16() -> u64 {
   let num = num::pow::pow(BigUint::new(vec![2]),1000);
-  digits(num).into_iter().map( |x| x as u64 ).sum()
+  biguint_digits(num).into_iter().map( |x| x as u64 ).sum()
 }
 
-fn digits(mut num : BigUint) -> Vec<i8> {
+fn biguint_digits(mut num : BigUint) -> Vec<i8> {
   if num == 0.to_biguint().unwrap() {
     return vec![0]
   }
