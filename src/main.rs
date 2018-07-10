@@ -9,15 +9,97 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  run_all();
-  //println!("Result: {}", problem_25());
-  assert!(problem_25() == ANSWERS[25]);
+  //run_all();
+  println!("Result: {}", old_problem_29());
+  println!("Result: {}", problem_29());
+  //assert_eq!(problem_28(),ANSWERS[28]);
   println!("Great work, team!");
 }
 
 #[allow(dead_code)]
 
+// FUCK THIS: THE GOTCHA IS THAT MANY OF THE RESULTS ARE TOO LARGE
+// WORKS FINE IN RUBY CAUSE THEY'RE BIGINTS BY DEFAULT
+fn old_problem_29() -> i64 {
+  let mut results = vec!();
+  for a in 2_i64..101 {
+    for b in 2..101 {
+      results.push(num::pow::pow(a.to_biguint().unwrap(),b));
+    }
+  }
+  //println!("{:?}",results);
+  results.sort_unstable();
+  let mut c = 1;
+  for i in 0..results.len()-1 {
+    if results[i] != results[i+1] {
+      c += 1;
+    }
+  }
+  return c;
+}
 
+fn problem_29() -> i64 {
+  use std::collections::HashSet;
+  let mut results = HashSet::new();
+  for a in 2_i64..101 {
+    for b in 2..101 {
+      results.insert(a.pow(b));
+    }
+  }
+  results.len() as i64
+}
+
+// Diagonal sum
+fn problem_28() -> i64 {
+  let mut edge_size = 2;
+  let mut sum = 1;
+  let mut n = 1;
+  while edge_size <= 1000 {
+    for _ in 0..4 {
+      n += edge_size;
+      sum += n;
+    }
+    edge_size += 2;
+  }
+  sum
+}
+
+// Quadratic Primes
+fn problem_27() -> i64 {
+  let mut latest_best = (0,0,0);
+  let mut primes = Primes::new();
+  let mut owned_primes = vec!(primes.next().unwrap());
+
+  for a in -999..1000 {
+    for b in -1000..1001 {
+
+      let mut count = 0;
+      for n in 0_i64.. {
+        let x = n.pow(2) + a * n + b;
+
+        if x > owned_primes[owned_primes.len()-1] {
+          loop {
+            let next = primes.next().unwrap();
+            owned_primes.push(next);
+            if x <= next { break; }
+          }
+        }
+
+        match owned_primes.binary_search(&x) {
+          Ok(_) => (),
+          Err(_) => break
+        }
+
+        count +=1;
+      }
+
+      if count > latest_best.2 {
+        latest_best = (a,b,count);
+      }
+    }
+  }
+  latest_best.0 * latest_best.1
+}
 
 
 // Skip using BigUint by recording chopping off lowest digit
@@ -756,33 +838,5 @@ const ANSWERS : [i64;101] = [ 0
 , 8739992577 , 18769 , 709 , 756872327473
 ];
 
-#[allow(dead_code)]
-fn run_all() {
-
-  assert!(problem_1() == ANSWERS[1] as i32);
-  assert!(problem_2() == ANSWERS[2] as i32);
-  assert!(problem_3() == ANSWERS[3]);
-  assert!(problem_4() == ANSWERS[4]);
-  assert!(problem_5() == ANSWERS[5] as u64);
-  assert!(problem_6() == ANSWERS[6] as u64);
-  assert!(problem_7() == ANSWERS[7]);
-  assert!(problem_8() == ANSWERS[8] as u64);
-  assert!(problem_9() == ANSWERS[9] as u64);
-  assert!(problem_10() == ANSWERS[10]);
-  assert!(problem_11() == ANSWERS[11] as i32);
-  assert!(problem_12() == ANSWERS[12] as i32);
-  assert!(problem_13() == ANSWERS[13] as u64);
-  assert!(problem_14() == ANSWERS[14] as u32);
-  assert!(problem_15() == ANSWERS[15] as u64);
-  assert!(problem_16() == ANSWERS[16] as u64);
-
-  assert!(problem_18() == ANSWERS[18]);
-  assert!(problem_19() == ANSWERS[19]);
-  assert!(problem_20() == ANSWERS[20]);
-  assert!(problem_21() == ANSWERS[21]);
-  assert!(problem_22() == ANSWERS[22]);
-  assert!(problem_23() == ANSWERS[23]);
-
-  assert!(problem_25() == ANSWERS[25]);
-
-}
+#[cfg(test)]
+mod tests;
