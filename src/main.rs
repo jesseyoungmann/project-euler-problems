@@ -18,12 +18,12 @@ fn main() {
 
 #[allow(dead_code)]
 fn problem_30() -> i64 {
-  println!("digits: {:?}",digits(1634));
   fn sum_of_power_of_digits(n: i64, pow: u32) -> i64 {
     digits(n).into_iter().map( |i| (i as i64).pow(pow) ).sum::<i64>()
   }
-  //println!("{}",sum_of_power_of_digits(1634,4));
   let mut result = 0;
+  // CHECK PREVIOUS COMMIT FOR CLEANER VERSION THATS JUST AS FAST
+  //
   // OKAY, WHAT'S THE INTUITION
   // SIMPLEST IS 1 mil max, since 999_999 > (9 ** 5) * 6
   // but 99_999 < (9 ** 5) * 5
@@ -32,39 +32,52 @@ fn problem_30() -> i64 {
   // this runs in under a second, but what can I get it down to?
 
   // codify process
-  /*
-  let mut max = 99;
-  let mut decimal = 10;
-  while max < sum_of_power_of_digits(max, 5) {
-    max = max * 10 + 9;
-    decimal *= 10;
-  }
-  loop {
-    if decimal < 10 { break; }
-    let next_max = max - decimal;
-    let x = sum_of_power_of_digits(next_max, 5);
-    if next_max == x {
-      max = next_max;
-      break;
-    }
-    if next_max > x {
-      max = next_max;
-    } else {
-      decimal = decimal / 10;
-    }
-  }
-  */
-  let max = 999_999;
-  println!("MAX: {}",max);
-  // WTF, CALCULATING BETTER MAX BARELY SAVES ANY TIME
-  // Okay, should I do the same thing, but iterate downwards from each max?
 
-  for n in 10..(max + 1) {
-    //whats the biggest it could possibly be? what numbers can we throw out?
-    // CAN PROBABLY USE A FIVE DIGIT ARRAY HERE? OR JUST DO THE LOOP OURSELVES? OR AN ITERATOR
-    if sum_of_power_of_digits(n,5) == n {
-      result += n;
+  let mut maxest_max = 99;
+  let mut maxest_decimal = 10;
+  while maxest_max < sum_of_power_of_digits(maxest_max, 5) {
+    maxest_max = maxest_max * 10 + 9;
+    maxest_decimal *= 10;
+  }
+
+  // SHAVED A TINY BIT OF TIME OFF, 0.8X to 0.79
+  // gotta be something better?
+  // oh right, we chose 1 mil cause 99_999 WASN'T bigger, so anything smaller won't matter
+  // gotta revert
+  // I could run this for every 1xxxx, 2xxxx, 3xxxx - recursively do it whenever we have
+  // enough while counting down that we know we can skip all below ones
+  // 99_999 is smaller, but 19_999 probably isn't. so whenever we hit a new turning point,
+  // we could start winding down again
+  // but how to know when?
+  while maxest_max > 10 {
+    println!("MAXEST: {}",maxest_max);
+    println!("DEC: {}",maxest_decimal);
+
+    let mut max = maxest_max;
+    let mut decimal = maxest_decimal;
+    loop {
+      if decimal < 10 { break; }
+      let next_max = max - decimal;
+      let x = sum_of_power_of_digits(next_max, 5);
+      if next_max == x {
+        max = next_max;
+        break;
+      }
+      if next_max > x {
+        max = next_max;
+      } else {
+        decimal = decimal / 10;
+      }
     }
+    println!("MAX: {}",max);
+
+    for n in maxest_decimal..(max + 1) {
+      if sum_of_power_of_digits(n,5) == n {
+        result += n;
+      }
+    }
+    maxest_max /= 10;
+    maxest_decimal /= 10;
   }
   result
 }
