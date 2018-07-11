@@ -31,6 +31,22 @@ fn factorial(n: i64) -> i64 {
   (1..n+1).fold(1, |p, n| p * n )
 }
 
+fn digits_reuse(num: i64, digits: &mut Vec<i8> ) {
+  digits.clear();
+  let mut num = num;
+  if num == 0 {
+    digits.push(0);
+    return;
+  }
+
+  while num > 0 {
+    let rem = num % 10;
+    let quot = num / 10;
+    digits.push(rem as i8);
+    num = quot;
+  }
+}
+
 fn problem_34() -> i64 {
   let mut factorials = [0;10];
   for i in 0..10 {
@@ -47,9 +63,11 @@ fn problem_34() -> i64 {
   println!("MAX: {}",max);
 
   let mut result = 0;
+  let mut digits : Vec<i8> = vec!();
   for i in 10..100_000_000 {
-    // REUSUE ARRAY?
-    if digits(i).iter().map(|i| factorials[*i as usize] ).sum::<i64>() == i {
+    // COULD BE SLICE
+    digits_reuse(i,&mut digits);
+    if digits.iter().map(|i| factorials[*i as usize] ).sum::<i64>() == i {
       result += i;
     }
   }
