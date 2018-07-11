@@ -24,20 +24,21 @@ fn run_all() {
   assert!(problem_14() == ANSWERS[14] as u32);
   assert!(problem_15() == ANSWERS[15] as u64);
   assert!(problem_16() == ANSWERS[16] as u64);
-
+  // MISSING 17
   assert!(problem_18() == ANSWERS[18]);
   assert!(problem_19() == ANSWERS[19]);
   assert!(problem_20() == ANSWERS[20]);
   assert!(problem_21() == ANSWERS[21]);
   assert!(problem_22() == ANSWERS[22]);
   assert!(problem_23() == ANSWERS[23]);
-
+  // MISSING 24
   assert!(problem_25() == ANSWERS[25]);
-
+  // MSSING 26
   assert!(problem_27() == ANSWERS[27]);
   assert!(problem_28() == ANSWERS[28]);
   assert!(problem_29() == ANSWERS[29]);
   assert!(problem_30() == ANSWERS[30]);
   assert!(problem_31() == ANSWERS[31]);
+  assert!(problem_32() == ANSWERS[32]);
 
 }

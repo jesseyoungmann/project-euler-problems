@@ -11,8 +11,114 @@ use std::io::prelude::*;
 
 fn main() {
   //println!("Result: {}", problem_29());
-  assert_eq!(problem_31(),ANSWERS[31]);
+  //assert_eq!(problem_32(),ANSWERS[32]);
+  let p = Permuter::new(vec![1,2,3]);
+  for perm in p {
+    println!("{:?}",perm);
+  }
   println!("Great work, team!");
+}
+
+
+struct Permuter<T : Clone> {
+  items: Vec<T>,
+  index: usize
+}
+
+impl<T : Clone> Permuter<T> {
+  fn new(items: Vec<T>) -> Self {
+    Self {
+      items: items,
+      index: 0
+    }
+  }
+}
+
+/* HOKAY, SO: we just have one index, that we increment by one each permutation. To map an
+ * index to a unique permutation, we use a 'factorial mod' math, like grabbing digits, but
+ * each time you div_mod, you decrease the denominator by one, because the sub array you
+ * need to grab from is smaller after the previous extraction.
+ * Then, to avoid creating actual sub arrays to index into with that list of indexes,
+ * we do a tricky iterating index, where you skip over already used indexes, and otherwise
+ * decrement the index until you find your item in the original item list.
+ */
+impl<T : Clone> Iterator for Permuter<T> {
+  type Item = Vec<T>;
+  fn next(&mut self) -> Option<Self::Item> {
+
+    // Quit if we hit the item length factorial, which is the total number of
+    // permutations
+    // We could also check if the factorial-mod index list is all 0's again, but
+    // then we'd have to track a 'seen 0 once' bool
+    if self.index == (1..self.items.len()+1).fold(1, |p, n| p*n) {
+      return None;
+    }
+
+    let mut result : Self::Item = vec!();
+    let mut index_used = vec![false; self.items.len()];
+    let mut current_indexes = vec!();
+    let mut index = self.index;
+    let mut modn = self.items.len();
+    while modn > 0 {
+      let j = index % modn;
+      index = index / modn;
+      modn -=1;
+      current_indexes.push(j);
+    }
+
+    for index in current_indexes {
+      let mut index = index;
+      let mut i = 0;
+      loop {
+        if index_used[i] {
+          i += 1;
+        } else if index == 0 {
+          break;
+        } else {
+          index -= 1;
+          i += 1;
+        }
+      }
+      result.push(self.items[i].clone());
+      index_used[i] = true;
+    }
+
+    self.index += 1;
+    Some(result)
+  }
+}
+
+fn problem_32() -> i64 {
+
+  fn from_digits(digits: &[i32]) -> i32 {
+    let mut result = 0;
+    for n in digits {
+      result = result * 10 + n;
+    }
+    result
+  }
+
+  let digits : Vec<i32> = (1..10).collect();
+  let mut results = vec!();
+  let len = digits.len();
+
+  for perm in Permuter::new(digits) {
+    for split_a in 1..len-2 {
+      for split_b in split_a+1..len-split_a-1 {
+        let a = from_digits(&perm[0..split_a]);
+        let b = from_digits(&perm[split_a..split_b]);
+        let c = from_digits(&perm[split_b..len]);
+        if a * b == c {
+          results.push(c);
+        }
+      }
+    }
+  }
+
+  results.sort_unstable();
+  results.dedup();
+  let sum : i32 = results.iter().sum();
+  sum as i64
 }
 
 fn problem_31() -> i64 {
