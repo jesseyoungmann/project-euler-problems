@@ -11,16 +11,92 @@ use std::io::prelude::*;
 
 fn main() {
   //println!("Result: {}", <i32>::max_value());
-  assert_eq!(problem_24(),ANSWERS[24]);
-  /*
-   * let p = Permuter::new(vec![0,1,2]);
-  for perm in p {
-    println!("{:?}",perm);
-  }
-  */
+  assert_eq!(problem_34(),ANSWERS[34]);
   println!("Great work, team!");
 }
 
+/*
+145 is a curious number, as 1! + 4! + 5! = 1 + 24 + 120 = 145.
+
+Find the sum of all numbers which are equal to the sum of the factorial of their digits.
+
+Note: as 1! = 1 and 2! = 2 are not sums they are not included.
+
+STOP AT 9! + 9! + 9!
+ 3_628_800 - 9 factorial .. X
+ so what decimal place is > 9 factorial * that pow? That'd be the biggest we have to check
+*/
+
+fn factorial(n: i64) -> i64 {
+  (1..n+1).fold(1, |p, n| p * n )
+}
+
+fn problem_34() -> i64 {
+  let mut factorials = [0;10];
+  for i in 0..10 {
+    factorials[i] = factorial(i as i64);
+  }
+
+  // WORKS, BUT 9 SECONDS ON RELEASE VERSION
+  let mut max = 10;
+  let mut decimal = 1;
+  while max < factorial(9) * decimal {
+    max *= 10;
+    decimal += 1;
+  }
+  println!("MAX: {}",max);
+
+  let mut result = 0;
+  for i in 10..100_000_000 {
+    // REUSUE ARRAY?
+    if digits(i).iter().map(|i| factorials[*i as usize] ).sum::<i64>() == i {
+      result += i;
+    }
+  }
+  result
+}
+
+
+// digit canceling fractions
+//There are exactly four non-trivial examples of this type of fraction, less than one in value, and containing two digits in the numerator and denominator.
+
+// If the product of these four fractions is given in its lowest common terms, find the value of the denominator.
+fn problem_33() -> i64 {
+  fn lowest_common_terms(frac: (i64,i64) ) -> (i64,i64) {
+    let (mut numerator, mut denominator) = frac;
+    for i in 2..std::cmp::min(numerator, denominator)+1 {
+      while numerator % i == 0 && denominator % i == 0 {
+        numerator /= i;
+        denominator /= i;
+      }
+    }
+    (numerator, denominator)
+  }
+
+  println!("!!!{:?}",lowest_common_terms((10,160)));
+  //just do float comparison and use an epsilon?
+  let mut results = vec!();
+  for n in 1..10 {
+    for x in 1..10 {
+      for y in 1..10 {
+        if x == n || y == n { continue; }
+        // type one
+        let t1_n = from_digits(&[x,n]);
+        let t1_d = from_digits(&[n,y]);
+
+        // COULD REPLACE THIS WITH JUST PUTTING THE SECOND IN LOWEST COMMON TERMS, BUT
+        // THIS IS MUCH FASTER
+        if ((t1_n as f64) / (t1_d as f64) - (x as f64) / (y as f64)).abs() < 0.0000000000001 {
+          results.push((t1_n,t1_d));
+        }
+      }
+    }
+  }
+
+  lowest_common_terms(
+    results.iter().fold((1,1), |(a,b), &(n,d)| lowest_common_terms((a * n, b * d)) )
+  ).1
+}
 
 struct Permuter<T : Clone> {
   items: Vec<T>,

@@ -40,5 +40,7 @@ fn run_all() {
   assert!(problem_30() == ANSWERS[30]);
   assert!(problem_31() == ANSWERS[31]);
   assert!(problem_32() == ANSWERS[32]);
+  assert!(problem_33() == ANSWERS[33]);
+  assert!(problem_34() == ANSWERS[34]);
 
 }
