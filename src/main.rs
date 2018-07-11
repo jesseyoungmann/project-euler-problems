@@ -10,12 +10,14 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  //println!("Result: {}", problem_29());
-  //assert_eq!(problem_32(),ANSWERS[32]);
-  let p = Permuter::new(vec![1,2,3]);
+  //println!("Result: {}", <i32>::max_value());
+  assert_eq!(problem_24(),ANSWERS[24]);
+  /*
+   * let p = Permuter::new(vec![0,1,2]);
   for perm in p {
     println!("{:?}",perm);
   }
+  */
   println!("Great work, team!");
 }
 
@@ -41,6 +43,11 @@ impl<T : Clone> Permuter<T> {
  * Then, to avoid creating actual sub arrays to index into with that list of indexes,
  * we do a tricky iterating index, where you skip over already used indexes, and otherwise
  * decrement the index until you find your item in the original item list.
+ *
+ * Okay, I updated it to increase the denominator by one in facmod, so we get lexicographic
+ * permutation order, and then we reverse the index order
+ * Because we want the first digit to vary the slowest, but have the most options, so we do
+ * index % len LAST.
  */
 impl<T : Clone> Iterator for Permuter<T> {
   type Item = Vec<T>;
@@ -54,17 +61,20 @@ impl<T : Clone> Iterator for Permuter<T> {
       return None;
     }
 
+    let len = self.items.len();
     let mut result : Self::Item = vec!();
     let mut index_used = vec![false; self.items.len()];
     let mut current_indexes = vec!();
     let mut index = self.index;
-    let mut modn = self.items.len();
-    while modn > 0 {
+    let mut modn = 1;
+    while modn <= len {
       let j = index % modn;
       index = index / modn;
-      modn -=1;
+      modn += 1;
       current_indexes.push(j);
     }
+
+    current_indexes.reverse();
 
     for index in current_indexes {
       let mut index = index;
@@ -88,16 +98,15 @@ impl<T : Clone> Iterator for Permuter<T> {
   }
 }
 
-fn problem_32() -> i64 {
-
-  fn from_digits(digits: &[i32]) -> i32 {
-    let mut result = 0;
-    for n in digits {
-      result = result * 10 + n;
-    }
-    result
+fn from_digits(digits: &[i32]) -> i64 {
+  let mut result : i64 = 0;
+  for n in digits {
+    result = result * 10 + (*n as i64);
   }
+  result
+}
 
+fn problem_32() -> i64 {
   let digits : Vec<i32> = (1..10).collect();
   let mut results = vec!();
   let len = digits.len();
@@ -117,7 +126,7 @@ fn problem_32() -> i64 {
 
   results.sort_unstable();
   results.dedup();
-  let sum : i32 = results.iter().sum();
+  let sum : i64 = results.iter().sum();
   sum as i64
 }
 
@@ -191,9 +200,6 @@ fn problem_30() -> i64 {
   // we could start winding down again
   // but how to know when?
   while maxest_max > 10 {
-    println!("MAXEST: {}",maxest_max);
-    println!("DEC: {}",maxest_decimal);
-
     let mut max = maxest_max;
     let mut decimal = maxest_decimal;
     loop {
@@ -210,7 +216,6 @@ fn problem_30() -> i64 {
         decimal = decimal / 10;
       }
     }
-    println!("MAX: {}",max);
 
     for n in maxest_decimal..(max + 1) {
       if sum_of_power_of_digits(n,5) == n {
@@ -343,7 +348,7 @@ fn problem_25() -> i64 {
 
 #[allow(dead_code)]
 fn problem_24() -> i64 {
-  20
+  from_digits(&Permuter::new(vec![0,1,2,3,4,5,6,7,8,9]).nth(1_000_000-1).unwrap()) as i64
   //(0..10).permutation().get(1_000_000).expect()
 }
 

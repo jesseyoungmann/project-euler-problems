@@ -31,7 +31,7 @@ fn run_all() {
   assert!(problem_21() == ANSWERS[21]);
   assert!(problem_22() == ANSWERS[22]);
   assert!(problem_23() == ANSWERS[23]);
-  // MISSING 24
+  assert!(problem_24() == ANSWERS[24]);
   assert!(problem_25() == ANSWERS[25]);
   // MSSING 26
   assert!(problem_27() == ANSWERS[27]);
