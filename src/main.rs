@@ -10,13 +10,48 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  //run_all();
   //println!("Result: {}", problem_29());
-  assert_eq!(problem_30(),ANSWERS[30]);
+  assert_eq!(problem_31(),ANSWERS[31]);
   println!("Great work, team!");
 }
 
-#[allow(dead_code)]
+fn problem_31() -> i64 {
+  use std::collections::HashMap;
+  // (amount, coins.len()) => number of ways
+  type HelperMap = HashMap<(i64,i64),i64>;
+  let mut memo : HelperMap = HashMap::new();
+
+  let mut coins = vec!(1,2,5,10,20,50,100,200);
+  coins.reverse();
+
+  fn helper(amount: i64, coins: &[i64], memo: &mut HelperMap) -> i64 {
+    assert!(amount > 0);
+
+    let len = coins.len() as i64;
+
+    if len == 0 { return 0; }
+
+    if let Some(&ways) = memo.get(&(amount,len)) { return ways; }
+
+    let mut ways = 0;
+    for i in 0..coins.len() {
+      let coin = coins[i];
+      let next_amount = amount - coin;
+
+      if next_amount == 0 {
+        ways += 1;
+      } else if next_amount > 0 {
+        ways += helper(next_amount, &coins[i..(len as usize)], memo);
+      }
+    }
+
+    memo.insert((amount,len),ways);
+    ways
+  }
+
+  helper(200,&coins,&mut memo)
+}
+
 fn problem_30() -> i64 {
   fn sum_of_power_of_digits(n: i64, pow: u32) -> i64 {
     digits(n).into_iter().map( |i| (i as i64).pow(pow) ).sum::<i64>()

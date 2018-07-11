@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn test_latest() {
-  assert_eq!(problem_29(),ANSWERS[29]);
+  //assert_eq!(problem_29(),ANSWERS[29]);
 }
 
 #[test]
@@ -36,5 +36,8 @@ fn run_all() {
 
   assert!(problem_27() == ANSWERS[27]);
   assert!(problem_28() == ANSWERS[28]);
+  assert!(problem_29() == ANSWERS[29]);
+  assert!(problem_30() == ANSWERS[30]);
+  assert!(problem_31() == ANSWERS[31]);
 
 }
