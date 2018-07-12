@@ -42,6 +42,7 @@ fn run_one(i: usize) -> i64 {
     33 => problem_33(),
     34 => problem_34(),
     35 => problem_35(),
+    36 => problem_36(),
     _ => -1
   };
   result as i64
@@ -49,11 +50,33 @@ fn run_one(i: usize) -> i64 {
 
 #[test]
 fn run_all() {
-  for i in 1..35 {
-    if i == 17 || i == 26 {
-      continue;
-    }
+  for i in 1..36 + 1 {
+    if i == 17 || i == 26 { continue; }
     assert_eq!(run_one(i),ANSWERS[i], "problem_{}()",i);
   }
 }
 
+use std::time::{Instant};
+
+#[test] #[ignore]
+fn benchmark_all() {
+  let mut results : Vec<(usize,f64)> = vec!();
+  for i in 1..36 + 1 {
+    if i == 17 || i == 26 { continue; }
+
+    let now = Instant::now();
+
+    assert_eq!(run_one(i),ANSWERS[i], "problem_{}()",i);
+
+    let elapsed = now.elapsed();
+    let t = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1_000_000_000.0);
+    //println!("problem_{}(): {} seconds",i,t);
+    results.push((i,t));
+  }
+
+  results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap() );
+  let total : f64 = results.iter().map(|&(_,t)| t).sum();
+  for &(p,t) in &results {
+    println!("problem_{}(): {}, {:.2}%",p,t,t*100_f64/total);
+  }
+}

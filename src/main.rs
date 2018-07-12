@@ -11,13 +11,46 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  let now = Instant::now();
-  assert_eq!(problem_35(),ANSWERS[35]);
-  //println!("Result: {}", problem_35());
-  let elapsed = now.elapsed();
-  let t = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1_000_000_000.0);
-  println!("Benchmark: {}",t);
+  //let now = Instant::now();
+  //assert_eq!(problem_36(),ANSWERS[36]);
+  //println!("Result: {:b}", 585);
+  //let elapsed = now.elapsed();
+  //let t = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1_000_000_000.0);
+  //println!("Benchmark: {}",t);
   println!("Great work, team!");
+}
+
+fn number_is_binary_palindrome(num:i64) -> bool {
+  fn digit_at(num:i64,index:u32) -> i64 {
+    (num >> index) % 2
+  }
+
+  let mut max_index = 0;
+  let mut min_index = 0;
+  while 2_i64.pow(max_index) <= num {
+    max_index += 1;
+  }
+  max_index -= 1;
+
+  while max_index > min_index {
+    if digit_at(num,max_index) != digit_at(num,min_index) {
+      return false;
+    }
+    max_index -= 1;
+    min_index += 1;
+  }
+
+  true
+}
+
+fn problem_36() -> i64 {
+  let mut result = 0;
+  for n in 1..1_000_000 {
+    if number_is_palindrome(n) && number_is_binary_palindrome(n) {
+      result += n;
+    }
+  }
+  result
 }
 
 fn problem_35() -> i64 {
@@ -76,13 +109,15 @@ fn problem_34() -> i64 {
   }
 
   // WORKS, BUT 9 SECONDS ON RELEASE VERSION
+  // Got it down by re-using digits, like 1.9 seconds
+  // still slowest by far
   let mut max = 10;
   let mut decimal = 1;
   while max < factorial(9) * decimal {
     max *= 10;
     decimal += 1;
   }
-  println!("MAX: {}",max);
+  //println!("MAX: {}",max);
 
   let mut result = 0;
   let mut digits : Vec<i8> = vec!();
@@ -113,7 +148,7 @@ fn problem_33() -> i64 {
     (numerator, denominator)
   }
 
-  println!("!!!{:?}",lowest_common_terms((10,160)));
+  //println!("!!!{:?}",lowest_common_terms((10,160)));
   //just do float comparison and use an epsilon?
   let mut results = vec!();
   for n in 1..10 {
@@ -993,11 +1028,11 @@ fn problem_4() -> i64 {
   result
 }
 
-fn digit_at(num:i64,index:u32) -> u32 {
-  ((num / 10_i64.pow(index)) % 10) as u32
-}
-
 fn number_is_palindrome(num:i64) -> bool {
+  fn digit_at(num:i64,index:u32) -> u32 {
+    ((num / 10_i64.pow(index)) % 10) as u32
+  }
+
   let mut max_index = 0;
   let mut min_index = 0;
   while 10_i64.pow(max_index) <= num {
@@ -1175,3 +1210,4 @@ const ANSWERS : [i64;101] = [ 0
 
 #[cfg(test)]
 mod tests;
+
