@@ -5,42 +5,55 @@ fn test_latest() {
   //assert_eq!(problem_29(),ANSWERS[29]);
 }
 
+fn run_one(i: usize) -> i64 {
+  let result = match i {
+    1 => problem_1(),
+    2 => problem_2(),
+    3 => problem_3(),
+    4 => problem_4(),
+    5 => problem_5(),
+    6 => problem_6(),
+    7 => problem_7(),
+    8 => problem_8(),
+    9 => problem_9(),
+    10 => problem_10(),
+    11 => problem_11(),
+    12 => problem_12(),
+    13 => problem_13(),
+    14 => problem_14(),
+    15 => problem_15(),
+    16 => problem_16(),
+    //17 => problem_17(),
+    18 => problem_18(),
+    19 => problem_19(),
+    20 => problem_20(),
+    21 => problem_21(),
+    22 => problem_22(),
+    23 => problem_23(),
+    24 => problem_24(),
+    25 => problem_25(),
+    //26 => problem_26(),
+    27 => problem_27(),
+    28 => problem_28(),
+    29 => problem_29(),
+    30 => problem_30(),
+    31 => problem_31(),
+    32 => problem_32(),
+    33 => problem_33(),
+    34 => problem_34(),
+    35 => problem_35(),
+    _ => -1
+  };
+  result as i64
+}
+
 #[test]
 fn run_all() {
-
-  assert!(problem_1() == ANSWERS[1] as i32);
-  assert!(problem_2() == ANSWERS[2] as i32);
-  assert!(problem_3() == ANSWERS[3]);
-  assert!(problem_4() == ANSWERS[4]);
-  assert!(problem_5() == ANSWERS[5] as u64);
-  assert!(problem_6() == ANSWERS[6] as u64);
-  assert!(problem_7() == ANSWERS[7]);
-  assert!(problem_8() == ANSWERS[8] as u64);
-  assert!(problem_9() == ANSWERS[9] as u64);
-  assert!(problem_10() == ANSWERS[10]);
-  assert!(problem_11() == ANSWERS[11] as i32);
-  assert!(problem_12() == ANSWERS[12] as i32);
-  assert!(problem_13() == ANSWERS[13] as u64);
-  assert!(problem_14() == ANSWERS[14] as u32);
-  assert!(problem_15() == ANSWERS[15] as u64);
-  assert!(problem_16() == ANSWERS[16] as u64);
-  // MISSING 17
-  assert!(problem_18() == ANSWERS[18]);
-  assert!(problem_19() == ANSWERS[19]);
-  assert!(problem_20() == ANSWERS[20]);
-  assert!(problem_21() == ANSWERS[21]);
-  assert!(problem_22() == ANSWERS[22]);
-  assert!(problem_23() == ANSWERS[23]);
-  assert!(problem_24() == ANSWERS[24]);
-  assert!(problem_25() == ANSWERS[25]);
-  // MSSING 26
-  assert!(problem_27() == ANSWERS[27]);
-  assert!(problem_28() == ANSWERS[28]);
-  assert!(problem_29() == ANSWERS[29]);
-  assert!(problem_30() == ANSWERS[30]);
-  assert!(problem_31() == ANSWERS[31]);
-  assert!(problem_32() == ANSWERS[32]);
-  assert!(problem_33() == ANSWERS[33]);
-  assert!(problem_34() == ANSWERS[34]);
-
+  for i in 1..35 {
+    if i == 17 || i == 26 {
+      continue;
+    }
+    assert_eq!(run_one(i),ANSWERS[i], "problem_{}()",i);
+  }
 }
+

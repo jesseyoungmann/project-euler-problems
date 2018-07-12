@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 extern crate num;
+use std::time::{Instant};
 
 use num::bigint::BigUint;
 use num::bigint::ToBigUint;
@@ -10,22 +11,43 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  //println!("Result: {}", <i32>::max_value());
-  assert_eq!(problem_34(),ANSWERS[34]);
+  let now = Instant::now();
+  assert_eq!(problem_35(),ANSWERS[35]);
+  //println!("Result: {}", problem_35());
+  let elapsed = now.elapsed();
+  let t = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1_000_000_000.0);
+  println!("Benchmark: {}",t);
   println!("Great work, team!");
 }
 
-/*
-145 is a curious number, as 1! + 4! + 5! = 1 + 24 + 120 = 145.
+fn problem_35() -> i64 {
+  let owned_primes = Primes::new().take_while(|&p| p < 1_000_000).collect::<Vec<i64>>();
 
-Find the sum of all numbers which are equal to the sum of the factorial of their digits.
+  let mut result = 1; // seed with 1 for `2`, which would break our prime testing
+  let mut digits : Vec<i8> = vec!();
+  'outer: for i in 3..1_000_000 {
+    if i % 2 == 0 { continue; }
+    digits_reuse(i, &mut digits);
+    if digits.iter().any(|d| d % 2 == 0) { continue; }
 
-Note: as 1! = 1 and 2! = 2 are not sums they are not included.
+    let len = digits.len();
+    for i in 0..len {
+      if let Err(_) = owned_primes.binary_search(&from_digits_i8(&digits)) {
+        continue 'outer;
+      }
+      if i != len-1 {
+        let first = digits[0];
+        for j in 1..len {
+          digits[j-1] = digits[j];
+        }
+        digits[len-1] = first;
+      }
+    }
 
-STOP AT 9! + 9! + 9!
- 3_628_800 - 9 factorial .. X
- so what decimal place is > 9 factorial * that pow? That'd be the biggest we have to check
-*/
+    result += 1;
+  }
+  result
+}
 
 fn factorial(n: i64) -> i64 {
   (1..n+1).fold(1, |p, n| p * n )
@@ -190,6 +212,14 @@ impl<T : Clone> Iterator for Permuter<T> {
     self.index += 1;
     Some(result)
   }
+}
+
+fn from_digits_i8(digits: &[i8]) -> i64 {
+  let mut result : i64 = 0;
+  for n in digits {
+    result = result * 10 + (*n as i64);
+  }
+  result
 }
 
 fn from_digits(digits: &[i32]) -> i64 {
@@ -639,9 +669,9 @@ fn problem_18() -> i64 {
 
 // problem_17() sucks - char length of all numbers 1 to 1000 as words
 
-fn problem_16() -> u64 {
+fn problem_16() -> i64 {
   let num = num::pow::pow(BigUint::new(vec![2]),1000);
-  biguint_digits(num).into_iter().map( |x| x as u64 ).sum()
+  biguint_digits(num).into_iter().map( |x| x as u64 ).sum::<u64>() as i64
 }
 
 fn biguint_digits(mut num : BigUint) -> Vec<i8> {
@@ -659,7 +689,7 @@ fn biguint_digits(mut num : BigUint) -> Vec<i8> {
   digits
 }
 
-fn problem_15() -> u64 {
+fn problem_15() -> i64 {
   let width = 21;
 
   let mut memo : Vec<u64> = vec![0;width * width];
@@ -678,10 +708,10 @@ fn problem_15() -> u64 {
     }
   }
 
-  memo[width * width - 1]
+  memo[width * width - 1] as i64
 }
 
-fn problem_14() -> u32 {
+fn problem_14() -> i64 {
   fn collatz_length(num: usize, memo: &mut [u32]) -> u32 {
     if num < 2_000_000 && memo[num] != 0 {
       memo[num]
@@ -714,13 +744,13 @@ fn problem_14() -> u32 {
     }
   }
 
-  biggest
+  biggest as i64
 }
 
 // The trick was recognizing, if you only need the first ten digits,
 // chop off all digits that are too far away to change the ten
 // with 100 numbers (12 digits probably? I did 14)
-fn problem_13() -> u64 {
+fn problem_13() -> i64 {
   let nums : [u64;100] = [
     3710728753390, 4637693767749, 7432498619952, 9194221336357, 2306758820753,
     8926167069662, 2811287981284, 4427422891743, 4745144573600, 7038648610584,
@@ -746,10 +776,10 @@ fn problem_13() -> u64 {
 
   let result : u64 = nums.iter().sum::<u64>() / 100000;
 
-  result
+  result as i64
 }
 
-fn problem_12() -> i32 {
+fn problem_12() -> i64 {
   let mut num = 1;
   let mut i = 2;
 
@@ -763,7 +793,7 @@ fn problem_12() -> i32 {
     i += 1;
   }
 
-  num
+  num as i64
 }
 
 fn num_divisors(num:i32) -> i32 {
@@ -781,7 +811,7 @@ fn num_divisors(num:i32) -> i32 {
   num_divisors
 }
 
-fn problem_11() -> i32 {
+fn problem_11() -> i64 {
   let grid : [[ i32; 20]; 20] = [
     [08,02,22,97,38,15,00,40,00,75,04,05,07,78,52,12,50,77,91,08],
     [49,49,99,40,17,81,18,57,60,87,17,40,98,43,69,48,04,56,62,00],
@@ -836,7 +866,7 @@ fn problem_11() -> i32 {
     }
   }
 
-  result
+  result as i64
 }
 
 
@@ -848,7 +878,7 @@ fn problem_10() -> i64 {
 
 // - - - - - - - - - - - - - - - - - - - -
 
-fn problem_9() -> u64 {
+fn problem_9() -> i64 {
   let mut result = 0;
 
   'outer: for c in 333_u64..997 {
@@ -861,12 +891,12 @@ fn problem_9() -> u64 {
     }
   }
 
-  result
+  result as i64
 }
 
 // - - - - - - - - - - - - - - - - - - - -
 
-fn problem_8() -> u64 {
+fn problem_8() -> i64 {
   let s = String::from("
     73167176531330624919225119674426574742355349194934
     96983520312774506326239578318016984801869478851843
@@ -898,7 +928,7 @@ fn problem_8() -> u64 {
     result = std::cmp::max(result,product);
   }
 
-  result
+  result as i64
 }
 // - - - - - - - - - - - - - - - - - - - -
 
@@ -911,15 +941,15 @@ fn problem_7() -> i64 {
 
 // - - - - - - - - - - - - - - - - - - - -
 
-fn problem_6() -> u64 {
+fn problem_6() -> i64 {
   let result = (1_u64..101_u64).fold(0,|acc,x| acc + x).pow(2) - (1_u64..101_u64).fold(0,|acc,x| acc + x.pow(2));
 
-  result
+  result as i64
 }
 
 // - - - - - - - - - - - - - - - - - - - -
 
-fn problem_5() -> u64 {
+fn problem_5() -> i64 {
   // Get unique prime factors, number has to be a multiple of the product of all of them,
   // so step by it
   let step : u64 = Primes::new().take_while( |&x| x < 21 ).product::<i64>() as u64;
@@ -943,7 +973,7 @@ fn problem_5() -> u64 {
     break;
   }
 
-  result
+  result as i64
 }
 
 // - - - - - - - - - - - - - - - - - - - -
@@ -1063,7 +1093,7 @@ impl Iterator for Primes {
 
 // - - - - - - - - - - - - - - - - - - - -
 
-fn problem_2() -> i32 {
+fn problem_2() -> i64 {
 
   let fib = Fibonacci::new();
 
@@ -1078,7 +1108,7 @@ fn problem_2() -> i32 {
     }
   }
 
-  result
+  result as i64
 }
 
 struct Fibonacci {
@@ -1108,7 +1138,7 @@ impl Iterator for Fibonacci {
 
 // - - - - - - - - - - - - - - - - - - - -
 
-fn problem_1() -> i32 {
+fn problem_1() -> i64 {
   let mut sum = 0;
 
   for i in 1..1000 {
