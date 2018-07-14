@@ -1,0 +1,2 @@
+[alias]
+mybench = ["test", "benchmark_all", "--release", "--", "--nocapture", "--ignored"]
