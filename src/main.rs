@@ -12,12 +12,131 @@ use std::io::prelude::*;
 
 fn main() {
   //let now = Instant::now();
-  //assert_eq!(problem_36(),ANSWERS[36]);
+  assert_eq!(problem_38(),ANSWERS[38]);
   //println!("Result: {:b}", 585);
   //let elapsed = now.elapsed();
   //let t = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1_000_000_000.0);
   //println!("Benchmark: {}",t);
   println!("Great work, team!");
+}
+
+fn problem_39() -> i64 {
+  let mut best = (0,0);
+  for perim in 10..1001_i64 {
+    let mut count = 0;
+    // how to limit hyp, can't be bigger than when
+    // hyp can get close to half, imagine 1 being one edge
+    // but at smallest it must have equal other edges?
+
+    // TODO: Find a better lower bound
+    for hyp in 1..perim/2 {
+      // Only have to check up to half of the remaining space
+      for edge1 in 1..(perim-hyp+1)/2 {
+        let edge2 = perim - hyp - edge1;
+        //println!("{},{},{}",hyp,edge1,edge2);
+        if hyp.pow(2) == edge1.pow(2) + edge2.pow(2) {
+          count += 1;
+        }
+      }
+    }
+    if count > best.1 {
+      best = (perim,count);
+    }
+  }
+  best.0
+}
+
+fn problem_38() -> i64 {
+
+  let mut results = vec!();
+  let mut digits : Vec<i8> = vec!();
+
+  'outer: for num in 10..10_000 {
+    let mut cache = [false; 10];
+    // Can't use 0, so mark it as already used
+    cache[0] = true;
+    let mut count = 0;
+
+    // can't be i of 1 only, right? cause the max is too small
+    let mut pandigital = 0_i64;
+    for i in 1.. {
+      let prod = num * i;
+      digits_reuse(prod, &mut digits);
+      digits.reverse();
+      for &d in &digits {
+        if cache[d as usize] { continue 'outer; }
+        cache[d as usize] = true;
+        pandigital = pandigital * 10 + d as i64;
+        count += 1;
+      }
+
+      if count == 9 { break; }
+      if count > 9 { continue 'outer; }
+    }
+    results.push(pandigital);
+  }
+
+  results.sort_unstable();
+  *results.last().unwrap_or(&0)
+}
+
+fn largest_power_of_ten(num: i64) -> u32 {
+  let mut pow = 0;
+  while 10_i64.pow(pow) <= num {
+    pow += 1;
+  }
+  pow -= 1;
+  pow
+}
+
+fn digit_at_pow(num: i64, pow: u32) -> i64 {
+  ((num / 10_i64.pow(pow)) % 10) * 10_i64.pow(pow)
+}
+
+fn problem_37() -> i64 {
+  let mut result = vec!();
+
+  let mut owned_primes = vec!();
+  //let owned_primes = Primes::new().take_while(|&p| p < 1_000_000).collect::<Vec<i64>>();
+
+  'outer: for prime in Primes::new() {
+  //'outer: for prime in 3797..3798 {
+    if prime > 1_000_000 {
+      println!("WTF");
+      break;
+    }
+    owned_primes.push(prime);
+    {
+      let mut prime = prime;
+      let mut pow = largest_power_of_ten(prime);
+      loop {
+        prime -= digit_at_pow(prime,pow);
+        //println!("{}",prime);
+        if let Err(_) = owned_primes.binary_search(&prime) {
+          continue 'outer;
+        }
+        pow -= 1;
+        if pow == 0 { break; }
+      }
+    }
+    {
+      let mut prime = prime;
+      prime = prime / 10;
+      while prime > 0 {
+        //println!("{}",prime);
+        if let Err(_) = owned_primes.binary_search(&prime) {
+          continue 'outer;
+        }
+        prime = prime / 10;
+      }
+    }
+    result.push(prime);
+    if result.len() == 11 {
+      break;
+    }
+  }
+
+  result.iter().sum()
 }
 
 fn number_is_binary_palindrome(num:i64) -> bool {
@@ -58,6 +177,7 @@ fn problem_35() -> i64 {
 
   let mut result = 1; // seed with 1 for `2`, which would break our prime testing
   let mut digits : Vec<i8> = vec!();
+
   'outer: for i in 3..1_000_000 {
     if i % 2 == 0 { continue; }
     digits_reuse(i, &mut digits);
@@ -404,6 +524,31 @@ fn digits(num: i64) -> Vec<i8> {
 
   digits
 }
+
+/*
+struct Digiterator {
+  num: i64
+}
+
+fn digits_iter(num: i64) -> Digiterator {
+  Digiterator {
+    num: num
+  }
+}
+
+impl Iterator for Digiterator {
+  type Item = i8;
+  fn next(&mut self) -> Option<Item> {
+    if num <= 0 {
+      return None;
+    }
+
+    let rem = self.num % 10;
+    self.num /= 10;
+    Some(rem as i8)
+  }
+}
+*/
 
 // FUCK THIS: THE GOTCHA IS THAT MANY OF THE RESULTS ARE TOO LARGE
 // WORKS FINE IN RUBY CAUSE THEY'RE BIGINTS BY DEFAULT
@@ -1111,7 +1256,7 @@ impl Iterator for Primes {
     while !Primes::is_prime(&self.found_primes,self.test_next) {
       self.test_next += 2;
       if self.test_next > std::i64::MAX / 2 {
-        println!("Max Fibonacci!");
+        println!("Max Prime!");
         return None
       }
     }
@@ -1159,7 +1304,7 @@ impl Fibonacci {
 
 impl Iterator for Fibonacci {
   type Item = i32;
-  fn next(&mut self) -> Option<i32> {
+  fn next(&mut self) -> Option<Self::Item> {
     self.current += self.previous;
     self.previous = self.current - self.previous;
     if self.current > std::i32::MAX / 2 {

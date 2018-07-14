@@ -5,54 +5,56 @@ fn test_latest() {
   //assert_eq!(problem_29(),ANSWERS[29]);
 }
 
-fn run_one(i: usize) -> i64 {
-  let result = match i {
-    1 => problem_1(),
-    2 => problem_2(),
-    3 => problem_3(),
-    4 => problem_4(),
-    5 => problem_5(),
-    6 => problem_6(),
-    7 => problem_7(),
-    8 => problem_8(),
-    9 => problem_9(),
-    10 => problem_10(),
-    11 => problem_11(),
-    12 => problem_12(),
-    13 => problem_13(),
-    14 => problem_14(),
-    15 => problem_15(),
-    16 => problem_16(),
-    //17 => problem_17(),
-    18 => problem_18(),
-    19 => problem_19(),
-    20 => problem_20(),
-    21 => problem_21(),
-    22 => problem_22(),
-    23 => problem_23(),
-    24 => problem_24(),
-    25 => problem_25(),
-    //26 => problem_26(),
-    27 => problem_27(),
-    28 => problem_28(),
-    29 => problem_29(),
-    30 => problem_30(),
-    31 => problem_31(),
-    32 => problem_32(),
-    33 => problem_33(),
-    34 => problem_34(),
-    35 => problem_35(),
-    36 => problem_36(),
-    _ => -1
-  };
-  result as i64
+fn problems() -> Vec<(usize,Box<Fn()->i64>)> {
+  vec![
+    (1, Box::new(problem_1)),
+    (2, Box::new(problem_2)),
+    (3, Box::new(problem_3)),
+    (4, Box::new(problem_4)),
+    (5, Box::new(problem_5)),
+    (6, Box::new(problem_6)),
+    (7, Box::new(problem_7)),
+    (8, Box::new(problem_8)),
+    (9, Box::new(problem_9)),
+    (10, Box::new(problem_10)),
+    (11, Box::new(problem_11)),
+    (12, Box::new(problem_12)),
+    (13, Box::new(problem_13)),
+    (14, Box::new(problem_14)),
+    (15, Box::new(problem_15)),
+    (16, Box::new(problem_16)),
+
+    (18, Box::new(problem_18)),
+    (19, Box::new(problem_19)),
+    (20, Box::new(problem_20)),
+    (21, Box::new(problem_21)),
+    (22, Box::new(problem_22)),
+    (23, Box::new(problem_23)),
+    (24, Box::new(problem_24)),
+    (25, Box::new(problem_25)),
+
+    (27, Box::new(problem_27)),
+    (28, Box::new(problem_28)),
+    (29, Box::new(problem_29)),
+    (30, Box::new(problem_30)),
+    (31, Box::new(problem_31)),
+    (32, Box::new(problem_32)),
+    (33, Box::new(problem_33)),
+    (34, Box::new(problem_34)),
+    (35, Box::new(problem_35)),
+    (36, Box::new(problem_36)),
+    (37, Box::new(problem_37)),
+    (38, Box::new(problem_38)),
+    (39, Box::new(problem_39)),
+    ]
+    //,=> problem_17()),
+    //,=> problem_26()),
 }
 
 #[test]
 fn run_all() {
-  for i in 1..36 + 1 {
-    if i == 17 || i == 26 { continue; }
-    assert_eq!(run_one(i),ANSWERS[i], "problem_{}()",i);
+  for (i,fun) in problems() {
+    assert_eq!(fun(),ANSWERS[i], "problem_{}()",i);
   }
 }
 
@@ -61,12 +63,10 @@ use std::time::{Instant};
 #[test] #[ignore]
 fn benchmark_all() {
   let mut results : Vec<(usize,f64)> = vec!();
-  for i in 1..36 + 1 {
-    if i == 17 || i == 26 { continue; }
-
+  for (i,fun) in problems() {
     let now = Instant::now();
 
-    assert_eq!(run_one(i),ANSWERS[i], "problem_{}()",i);
+    assert_eq!(fun(),ANSWERS[i], "problem_{}()",i);
 
     let elapsed = now.elapsed();
     let t = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1_000_000_000.0);
