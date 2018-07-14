@@ -12,7 +12,7 @@ use std::io::prelude::*;
 
 fn main() {
   //let now = Instant::now();
-  assert_eq!(problem_38(),ANSWERS[38]);
+  assert_eq!(problem_34(),ANSWERS[34]);
   //println!("Result: {:b}", 585);
   //let elapsed = now.elapsed();
   //let t = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1_000_000_000.0);
@@ -237,11 +237,11 @@ fn problem_34() -> i64 {
     max *= 10;
     decimal += 1;
   }
-  //println!("MAX: {}",max);
+  println!("MAX: {}",max);
 
   let mut result = 0;
   let mut digits : Vec<i8> = vec!();
-  for i in 10..100_000_000 {
+  for i in 10..max {
     // COULD BE SLICE
     digits_reuse(i,&mut digits);
     if digits.iter().map(|i| factorials[*i as usize] ).sum::<i64>() == i {
