@@ -699,11 +699,11 @@ impl<'a,T> Iterator for Permutation<T> {
 // 16 seconds instead of 12
 // very similar time for release? or losing back some optimized time?
 fn problem_23() -> i64 {
-  let limit = 28123 + 1;
+  let limit = 28123_usize + 1;
   let mut abundant_numbers : Vec<usize> = Vec::new();
   let mut is_abundant : std::collections::HashMap<usize,bool> = std::collections::HashMap::new();
 
-  let primes = Primes::new().take_while(|&p| p < 1_000_000).collect::<Vec<i64>>();
+  let primes = Primes::new().take_while(|&p| p < limit as i64).collect::<Vec<i64>>();
   let mut reuse = vec!();
 
   for i in 12_usize..limit {
@@ -1150,6 +1150,7 @@ fn problem_11() -> i64 {
 }
 
 
+// Probably not improvable? Just gotta do the actual work of calculating primes
 fn problem_10() -> i64 {
   let result : i64 = Primes::new().take_while( |&x| x < 2_000_000 ).sum();
 
