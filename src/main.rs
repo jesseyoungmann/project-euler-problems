@@ -12,7 +12,7 @@ use std::io::prelude::*;
 
 fn main() {
   //let now = Instant::now();
-  assert_eq!(problem_23(),ANSWERS[23]);
+  assert_eq!(problem_24(),ANSWERS[24]);
   /*
   let primes = Primes::new().take_while(|&p| p < 1_000_000).collect::<Vec<i64>>();
   let stuff = properest_divisors(12,&primes);
@@ -659,7 +659,13 @@ fn problem_25() -> i64 {
 
 #[allow(dead_code)]
 fn problem_24() -> i64 {
-  from_digits(&Permuter::new(vec![0,1,2,3,4,5,6,7,8,9]).nth(1_000_000-1).unwrap()) as i64
+  //from_digits(&Permuter::new(vec![0,1,2,3,4,5,6,7,8,9]).nth(1_000_000-1).unwrap()) as i64
+  // Okay, so! Since Permuter just increments an index after each, just fuck with the index
+  // directly!
+  // TODO: Implement this as a `skip` method on the iterator
+  let mut p = Permuter::new(vec![0,1,2,3,4,5,6,7,8,9]);
+  p.index = 1_000_000-1;
+  from_digits(&p.next().unwrap()) as i64
   //(0..10).permutation().get(1_000_000).expect()
 }
 
