@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 extern crate num;
-use std::time::{Instant};
+//use std::time::{Instant};
 
 use num::bigint::BigUint;
 use num::bigint::ToBigUint;
@@ -12,7 +12,14 @@ use std::io::prelude::*;
 
 fn main() {
   //let now = Instant::now();
-  assert_eq!(problem_34(),ANSWERS[34]);
+  assert_eq!(problem_23(),ANSWERS[23]);
+  /*
+  let primes = Primes::new().take_while(|&p| p < 1_000_000).collect::<Vec<i64>>();
+  let stuff = properest_divisors(12,&primes);
+  println!("{:?}",stuff);
+  let stuff = properest_divisors(12*11,&primes);
+  */
+  //println!("{:?}",stuff);
   //println!("Result: {:b}", 585);
   //let elapsed = now.elapsed();
   //let t = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1_000_000_000.0);
@@ -237,7 +244,7 @@ fn problem_34() -> i64 {
     max *= 10;
     decimal += 1;
   }
-  println!("MAX: {}",max);
+  //println!("MAX: {}",max);
 
   let mut result = 0;
   let mut digits : Vec<i8> = vec!();
@@ -690,8 +697,14 @@ fn problem_23() -> i64 {
   let mut abundant_numbers : Vec<usize> = Vec::new();
   let mut is_abundant : std::collections::HashMap<usize,bool> = std::collections::HashMap::new();
 
-  for i in 12..limit {
-    if sum_of_proper_divisors(i) > i {
+  let primes = Primes::new().take_while(|&p| p < 1_000_000).collect::<Vec<i64>>();
+  let mut reuse = vec!();
+
+  for i in 12_usize..limit {
+    // i+i since properest returns the value itself
+    // TODO: Memoize? Memoize just with the sum?
+    properest_divisors(i as i64,&primes,&mut reuse);
+    if reuse.iter().sum::<i64>() as usize > i+i {
       abundant_numbers.push(i);
       is_abundant.insert(i,true);
     }
@@ -719,7 +732,7 @@ fn problem_23() -> i64 {
 
 #[allow(dead_code)]
 fn proper_divisors(num : usize) -> Vec<usize> {
-  let mut result = Vec::new();
+  let mut result = vec!(1);
   for i in 2..(num / 2 + ( 1 - num % 2 )) {
     if num % i == 0 {
       result.push(i);
@@ -736,6 +749,87 @@ fn sum_of_proper_divisors(num: usize) -> usize {
     }
   }
   sum
+}
+
+fn new_sum_of_proper_divisors(num: usize, divisor_tree: &Vec<Vec<usize>>) -> usize {
+  let mut sum = 1;
+  let max = num / 2 + (1 - num % 2);
+  for v in divisor_tree {
+    if v[0] > max { break; }
+    for (i,&d) in v.iter().enumerate() {
+      if d > max { break; }
+      if num % d == 0 {
+        sum += d;
+      } else {
+        // If the multiple is not a divisor, no future ones should be?
+        // maybe just, if first is not, break, else check the rest
+        if i == 0 {
+          break;
+        }
+      }
+    }
+  }
+  sum
+}
+
+// hmm, could we build a tree of divisors?
+// loop through each, multiples of each prime that are unique to that prime
+// TODO: use std::collections::BitVec;
+fn divisor_tree(max: usize) -> Vec<Vec<usize>> {
+  use std::collections::HashMap;
+  let mut result = vec!();
+  let mut seen : HashMap<usize,bool> = HashMap::new();
+  for prime in Primes::new() {
+    let prime = prime as usize;
+    if prime > max { break; }
+    let mut stuff = vec!(prime);
+    seen.insert(prime,true);
+
+    let mut multiple = prime + prime;
+    while multiple < max {
+      let was_seen = seen.get(&multiple).is_some();
+      if !was_seen {
+        seen.insert(multiple,true);
+        stuff.push(multiple);
+      }
+      multiple += prime;
+    }
+
+    result.push(stuff);
+  }
+  result
+}
+
+
+//fn properest_divisors(num: i64, primes: &Vec<i64>, reuse: &mut Vec<i64>) -> i64 {
+fn properest_divisors(num: i64, primes: &Vec<i64>, results: &mut Vec<i64>) {
+  results.clear();
+  //let mut results = reuse;
+  //let mut results = vec!(1);
+  results.push(1);
+  let mut num = num;
+
+  for &prime in primes {
+    if num == 1 { break; }
+
+    // HOW TO HANDLE PRIME POWERS? ONLY START AT THE NEW ONES?
+    // anything you've already multiplied 2 by is used
+    let mut starting = 0;
+    let len = results.len();
+
+    while num % prime == 0 {
+      num = num / prime;
+
+      for i in starting..len+starting {
+        let o = results[i] * prime;
+        results.push(o);
+      }
+      starting += len;
+      //println!("prime: {}, num: {}, results: {:?}",prime,num,results);
+    }
+  }
+  //results.sort_unstable();
+  //results
 }
 
 fn problem_22() -> i64 {
