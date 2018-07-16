@@ -10,7 +10,7 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  assert_eq!(problem_42(),ANSWERS[42]);
+  assert_eq!(problem_17(),ANSWERS[17]);
   //println!("Result: {:b}", 585);
   println!("Great work, team!");
 }
@@ -998,7 +998,75 @@ fn problem_18() -> i64 {
   max_totals[max_totals.len()-1][0] as i64
 }
 
-// problem_17() sucks - char length of all numbers 1 to 1000 as words
+//if the numbers 1 to 5 are written out in words: one, two, three, four, five, then there are 3 + 3 + 5 + 4 + 4 = 19 letters used in total.
+
+//If all the numbers from 1 to 1000 (one thousand) inclusive were written out in words, how many letters would be used?
+
+fn problem_17() -> i64 {
+  fn tens_len(num: usize) -> usize {
+    assert!(num < 10);
+    match num {
+      2 => "twenty".len(),
+      3 => "thirty".len(),
+      4 => "forty".len(),
+      5 => "fifty".len(),
+      6 => "sixty".len(),
+      7 => "seventy".len(),
+      8 => "eighty".len(),
+      9 => "ninety".len(),
+      _ => panic!()
+    }
+  }
+
+  fn under_hundred_len(num: usize) -> usize {
+    assert!(num < 100);
+    match num {
+      0 => 0, // Used for stuff like 40
+      1 => "one".len(),
+      2 => "two".len(),
+      3 => "three".len(),
+      4 => "four".len(),
+      5 => "five".len(),
+      6 => "six".len(),
+      7 => "seven".len(),
+      8 => "eight".len(),
+      9 => "nine".len(),
+      10 => "ten".len(),
+      11 => "eleven".len(),
+      12 => "twelve".len(),
+      13 => "thirteen".len(),
+      14 => "fourteen".len(),
+      15 => "fifteen".len(),
+      16 => "sixteen".len(),
+      17 => "seventeen".len(),
+      18 => "eighteen".len(),
+      19 => "nineteen".len(),
+      20 ... 99 => tens_len(num / 10) + under_hundred_len(num % 10),
+      _ => panic!()
+    }
+  }
+
+  fn number_len(num: usize) -> usize {
+    if num == 1000 {
+      return "onethousand".len()
+    }
+    let hundreds = num / 100;
+    let under_hundred = num % 100;
+
+    let mut a = under_hundred_len(hundreds);
+    if a > 0 {
+      a += "hundred".len();
+    }
+    let b = under_hundred_len(under_hundred);
+    if a > 0 && b > 0 {
+      a + "and".len() + b
+    } else {
+      a + b
+    }
+  }
+
+  (1..1001).map( |i| number_len(i) as i64 ).sum()
+}
 
 fn problem_16() -> i64 {
   let num = num::pow::pow(BigUint::new(vec![2]),1000);
