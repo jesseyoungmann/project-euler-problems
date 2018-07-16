@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 extern crate num;
-//use std::time::{Instant};
 
 use num::bigint::BigUint;
 use num::bigint::ToBigUint;
@@ -11,20 +10,72 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  //let now = Instant::now();
-  assert_eq!(problem_24(),ANSWERS[24]);
-  /*
-  let primes = Primes::new().take_while(|&p| p < 1_000_000).collect::<Vec<i64>>();
-  let stuff = properest_divisors(12,&primes);
-  println!("{:?}",stuff);
-  let stuff = properest_divisors(12*11,&primes);
-  */
-  //println!("{:?}",stuff);
+  assert_eq!(problem_42(),ANSWERS[42]);
   //println!("Result: {:b}", 585);
-  //let elapsed = now.elapsed();
-  //let t = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1_000_000_000.0);
-  //println!("Benchmark: {}",t);
   println!("Great work, team!");
+}
+
+fn problem_42() -> i64 {
+  let mut triangle_numbers = vec!();
+  for n in 1..10_000 {
+    triangle_numbers.push( (n * (n+1) / 2) );
+  }
+  let triangle_word = |word: &str| {
+    let mut sum = 0;
+    for c in word.chars() {
+      assert!(c != '"');
+      sum += c as usize - 'A' as usize + 1;
+    }
+    triangle_numbers.binary_search(&sum).is_ok()
+  };
+
+  //println!("triangle_word? {}",triangle_word(&"SKY"));
+
+  let mut f = File::open("assets/p042_words.txt").expect("File not found!");
+  let mut file_text = String::new();
+  f.read_to_string(&mut file_text).expect("Something went wrong reading file!");
+
+  let mut result = 0;
+  for word in file_text.split(",") {
+    let word = &word[1..word.len()-1]; //chop off quotes
+    if triangle_word(&word) {
+      result += 1;
+    }
+  }
+  result
+}
+
+fn problem_41() -> i64 {
+  unimplemented!();
+}
+
+fn problem_40() -> i64 {
+  let indexes = [1,10,100,1_000,10_000,100_000,1_000_000];
+  let mut i = 0;
+  let mut index = indexes[i];
+  let mut result : i64 = 1;
+
+  let mut reuse = vec!();
+  let mut so_far = 0;
+
+  for num in 1.. {
+    digits_reuse(num,&mut reuse);
+    so_far += reuse.len();
+    if index > so_far {
+      //index -= reuse.len();
+      //println!("not big enough: {},{}",index,so_far);
+    } else {
+      //println!("big enough: {},{},{:?}",index,so_far,reuse);
+      // cause it's reversed, do so_far - index. Some -1's cancel out from reversing
+      // and from indexes not being 0 based
+      result *= reuse[so_far - index] as i64;
+
+      i += 1;
+      if i == indexes.len() { break; }
+      index = indexes[i]
+    }
+  }
+  result
 }
 
 fn problem_39() -> i64 {
@@ -839,26 +890,26 @@ fn properest_divisors(num: i64, primes: &Vec<i64>, results: &mut Vec<i64>) {
 }
 
 fn problem_22() -> i64 {
-    let mut f = File::open("assets/names.txt").expect("File not found!");
+  let mut f = File::open("assets/names.txt").expect("File not found!");
 
-    let mut file_text = String::new();
-    //let mut file_text = (r#""what is " going on ""#).to_string();
+  let mut file_text = String::new();
+  //let mut file_text = (r#""what is " going on ""#).to_string();
 
-    f.read_to_string(&mut file_text).expect("Something went wrong reading file!");
+  f.read_to_string(&mut file_text).expect("Something went wrong reading file!");
 
-    file_text = file_text.replace(r#"""#,"");
+  file_text = file_text.replace(r#"""#,"");
 
-    let mut strings = file_text.split(",").collect::<Vec<_>>();
+  let mut strings = file_text.split(",").collect::<Vec<_>>();
 
-    strings.sort();
+  strings.sort();
 
-    let mut sum = 0_i64;
-    for (index,s) in strings.iter().enumerate() {
-      let value : i64 = s.bytes().map(|b| (b - ('A' as u8) + 1) as i64 ).sum();
-      sum += value * (1 + (index as i64));
-    }
+  let mut sum = 0_i64;
+  for (index,s) in strings.iter().enumerate() {
+    let value : i64 = s.bytes().map(|b| (b - ('A' as u8) + 1) as i64 ).sum();
+    sum += value * (1 + (index as i64));
+  }
 
-    sum
+  sum
 }
 
 fn problem_21() -> i64 {
@@ -1059,6 +1110,7 @@ fn problem_13() -> i64 {
   result as i64
 }
 
+// TODO: Probably could use properest_divisors here
 fn problem_12() -> i64 {
   let mut num = 1;
   let mut i = 2;
