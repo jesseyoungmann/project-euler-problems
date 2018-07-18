@@ -10,7 +10,7 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  assert_eq!(problem_17(),ANSWERS[17]);
+  assert_eq!(problem_41(),ANSWERS[41]);
   //println!("Result: {:b}", 585);
   println!("Great work, team!");
 }
@@ -45,8 +45,35 @@ fn problem_42() -> i64 {
   result
 }
 
+// just loading primes is slow
+// instead, let's use permutations
+// starting with all 9
+// and break if we find a prime
 fn problem_41() -> i64 {
-  unimplemented!();
+  fn is_prime(num: i64) -> bool {
+    let max = (num as f64).sqrt() as i64;
+
+    for i in 2..max+1 {
+      if num % i == 0 {
+        return false;
+      }
+    }
+    true
+  }
+
+  for i in 4..9 {
+    let mut digits = (1..(13-i)).collect::<Vec<_>>();
+    // Reverse so we start with the largest?
+    digits.reverse();
+    for perm in Permuter::new(digits) {
+      let possible = from_digits(&perm);
+      if is_prime(possible) {
+        return possible;
+      }
+    }
+  }
+
+  0
 }
 
 fn problem_40() -> i64 {
@@ -674,6 +701,81 @@ fn problem_27() -> i64 {
   latest_best.0 * latest_best.1
 }
 
+
+// longest recurring cycle
+// okay, use ints, do long division with div and rem
+// keep a list of possible cycling?
+// push into array, check if it matches first
+// what if you start with the same one? don't check for match unless you've had at least 2
+// distinct chars?
+// if you only ever see one char, at then end (max checks) just decide it was repeating 1
+// this counts for 0 as well
+//
+// how to handle 0.1(6), where the first never re-occurs?
+// will the longest pattern possibly have a non repeating start?
+fn problem_26() -> i64 {
+  let mut pattern = vec!();
+
+  fn advance_long_division(num: i64,rem: i64) -> (i64,i64) {
+    let times = rem / num;
+    let o = (rem % num) * 10;
+    (times, o) //dropping down 0, cause 1 is like that
+  }
+
+  fn verify_pattern(pattern: &[i64], num: i64, out: i64, rem: i64) -> bool {
+    let mut out = out;
+    let mut rem = rem;
+    // TODO: not as many checks for longer patterns?
+    for i in 0..(pattern.len() * 10) {
+      if pattern[i % pattern.len()] != out {
+        return false;
+      }
+      let (_out,_rem) = advance_long_division(num,rem);
+      out = _out;
+      rem = _rem;
+    }
+    true
+  }
+
+
+  let mut best = (1,1);
+
+  'outer: for num in 2..1000 {
+  //'outer: for num in 13..14 {
+    pattern.clear();
+    let mut num = num;
+    let mut rem = 1;
+
+    // Skip any pre-pattern shit
+    // 20 just happens to work (I think actually 10 is the longest
+    // starting amount, any way to prove that?
+    for i in 0..20 {
+      let (out,_rem) = advance_long_division(num,rem);
+      rem = _rem;
+      if i == 19 {
+        pattern.push(out);
+      }
+    }
+
+    assert!(pattern.len() != 0);
+
+    // Eventually there will be a pattern!
+    loop {
+      let (out,_rem) = advance_long_division(num,rem);
+
+      if verify_pattern(&pattern,num,out,_rem) {
+        if pattern.len() > best.1 {
+          best = (num,pattern.len());
+        }
+        continue 'outer;
+      } else {
+        rem = _rem;
+        pattern.push(out);
+      }
+    }
+  }
+  best.0 as i64
+}
 
 // Skip using BigUint by recording chopping off lowest digit
 // and recording number of chopped digits
