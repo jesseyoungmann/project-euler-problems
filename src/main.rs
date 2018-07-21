@@ -10,9 +10,43 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  assert_eq!(problem_41(),ANSWERS[41]);
+  assert_eq!(problem_43(),ANSWERS[43]);
   //println!("Result: {:b}", 585);
   println!("Great work, team!");
+}
+
+//slower cause of starting at 0
+//if we fail on the %2 test, we can add directly to permuter index
+//to skip all the smaller ones (until we would flip the ..4 place)
+fn problem_43() -> i64 {
+  let mut result = 0;
+  let mut perm = vec!();
+  let mut permuter = Permuter::new(vec![0,1,2,3,4,5,6,7,8,9]);
+  // IF IT LOOPS AROUND, IT FAILS
+  while permuter.permute(&mut perm) {
+    if from_digits_i8(&perm[1..4]) % 2 != 0 {
+      permuter.index += 6 * 5 * 4 * 3 * 2 - 1;
+      continue;
+    }
+    if from_digits_i8(&perm[2..5]) % 3 != 0 {
+      permuter.index += 5 * 4 * 3 * 2 - 1;
+      continue;
+    }
+    if from_digits_i8(&perm[3..6]) % 5 != 0 {
+      permuter.index += 4 * 3 * 2 - 1;
+      continue;
+    }
+    if from_digits_i8(&perm[4..7]) % 7 != 0 {
+      permuter.index += 3 * 2 - 1;
+      continue;
+    }
+    if from_digits_i8(&perm[5..8]) % 11 == 0 &&
+      from_digits_i8(&perm[6..9]) % 13 == 0 &&
+      from_digits_i8(&perm[7..10]) % 17 == 0 {
+      result += from_digits_i8(&perm);
+    }
+  }
+  result
 }
 
 fn problem_42() -> i64 {
@@ -380,6 +414,8 @@ fn problem_33() -> i64 {
 
 struct Permuter<T : Clone> {
   items: Vec<T>,
+  index_used: Vec<bool>,
+  current_indexes: Vec<usize>,
   index: usize
 }
 
@@ -387,7 +423,9 @@ impl<T : Clone> Permuter<T> {
   fn new(items: Vec<T>) -> Self {
     Self {
       items: items,
-      index: 0
+      index: 0,
+      index_used: vec!(),
+      current_indexes: vec!()
     }
   }
 }
@@ -407,36 +445,51 @@ impl<T : Clone> Permuter<T> {
  */
 impl<T : Clone> Iterator for Permuter<T> {
   type Item = Vec<T>;
-  fn next(&mut self) -> Option<Self::Item> {
+  fn next(&mut self) -> Option<Vec<T>> {
+    let mut result : Vec<T> = vec!();
+    // moves result inside, returns it
+    if self.permute(&mut result) {
+      Some(result)
+    } else {
+      None
+    }
+  }
+}
 
+impl<T : Clone> Permuter<T> {
+  fn permute(&mut self, result: &mut Vec<T>) -> bool {
+    // TODO CHECK COST IF 0 LEN
+    result.clear();
     // Quit if we hit the item length factorial, which is the total number of
     // permutations
     // We could also check if the factorial-mod index list is all 0's again, but
     // then we'd have to track a 'seen 0 once' bool
-    if self.index == (1..self.items.len()+1).fold(1, |p, n| p*n) {
-      return None;
+    if self.index >= (1..self.items.len()+1).fold(1, |p, n| p*n) {
+      return false;
     }
 
     let len = self.items.len();
-    let mut result : Self::Item = vec!();
-    let mut index_used = vec![false; self.items.len()];
-    let mut current_indexes = vec!();
+    self.index_used.clear();
+    for _ in 0..len {
+      self.index_used.push(false);
+    }
+    self.current_indexes.clear();
     let mut index = self.index;
     let mut modn = 1;
     while modn <= len {
       let j = index % modn;
       index = index / modn;
       modn += 1;
-      current_indexes.push(j);
+      self.current_indexes.push(j);
     }
 
-    current_indexes.reverse();
+    self.current_indexes.reverse();
 
-    for index in current_indexes {
+    for &index in &self.current_indexes {
       let mut index = index;
       let mut i = 0;
       loop {
-        if index_used[i] {
+        if self.index_used[i] {
           i += 1;
         } else if index == 0 {
           break;
@@ -446,11 +499,11 @@ impl<T : Clone> Iterator for Permuter<T> {
         }
       }
       result.push(self.items[i].clone());
-      index_used[i] = true;
+      self.index_used[i] = true;
     }
 
     self.index += 1;
-    Some(result)
+    true
   }
 }
 
