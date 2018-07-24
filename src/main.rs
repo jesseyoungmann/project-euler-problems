@@ -10,42 +10,74 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  assert_eq!(problem_44(),ANSWERS[44]);
+  assert_eq!(problem_45(),ANSWERS[45]);
   //println!("Result: {:b}", 585);
   println!("Great work, team!");
 }
 
-fn problem_44() -> i64 {
-  let mut pentagonals = vec!();
-  for n in 1..10_000_i64 {
-    pentagonals.push(n.checked_mul(3 * n - 1).unwrap() / 2);
+fn problem_45() -> i64 {
+  fn triangle(n: i64) -> i64 { n * (n + 1) / 2 }
+  fn pentagonal(n: i64) -> i64 { n * (3 * n - 1) / 2 }
+  fn hexagonal(n: i64) -> i64 { n * (2 * n - 1) }
+
+  let mut i = 2;
+  let mut j = 2;
+
+  for k in 2.. {
+    let p_k = hexagonal(k);
+    while triangle(i) < p_k {
+      i += 1;
+    }
+    while pentagonal(j) < p_k {
+      j += 1;
+    }
+    if p_k != 40755 && p_k == triangle(i) && p_k == pentagonal(j) {
+      return p_k
+    }
   }
-  println!("{:?}",&pentagonals[0..10]);
-  let mut best = (0,1_000_000_000);
+  unreachable!();
+}
 
-  for j in 1..pentagonals.len()-1 {
-    let p_j = pentagonals[j];
-    for k in j+1..pentagonals.len() {
-      let p_k = pentagonals[k];
+fn problem_44() -> i64 {
+  fn add_pentagonals(ps: &mut Vec<i64>, starting: usize, max: i64) -> usize {
+    for i in starting.. {
+      let next = (i.checked_mul(3 * i - 1).unwrap() / 2) as i64;
+      ps.push(next);
+      if next >= max {
+        return i+1;
+      }
+    }
+    unreachable!();
+  }
 
-      // DO THIS EVEN IF DIFF AND SUM ARE NOT PENTAGONAL
-      if p_k - p_j > best.1 - best.0 {
-        break;
+  let mut pentagonals = vec!();
+  let mut starting = 1;
+  starting = add_pentagonals(&mut pentagonals,starting,100);
+
+  let mut gap = 1;
+
+  for x in 0.. {
+    for i in 0..x {
+      let p_j = pentagonals[i];
+      let p_k = pentagonals[i + gap];
+      let sum = p_j + p_k;
+      if sum > pentagonals[pentagonals.len()-1] {
+        starting = add_pentagonals(&mut pentagonals, starting, sum);
       }
 
       if let Err(_) = pentagonals.binary_search(&(p_k - p_j)) {
         continue;
       }
 
-      if let Err(_) = pentagonals.binary_search(&(p_k + p_j)) {
+      if let Err(_) = pentagonals.binary_search(&sum) {
         continue;
       }
 
-      best = (p_j,p_k);
+      return p_k - p_j;
     }
+    gap += 1;
   }
-
-  best.1 - best.0
+  unreachable!();
 }
 
 //slower cause of starting at 0

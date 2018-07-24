@@ -51,6 +51,7 @@ fn problems() -> Vec<(usize,Box<Fn()->i64>)> {
     (42, Box::new(problem_42)),
     (43, Box::new(problem_43)),
     (44, Box::new(problem_44)),
+    (45, Box::new(problem_45)),
     ]
     //,=> problem_17()),
     //,=> problem_26()),
@@ -79,9 +80,14 @@ fn benchmark_all() {
     results.push((i,t));
   }
 
-  results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap() );
   let total : f64 = results.iter().map(|&(_,t)| t).sum();
   for &(p,t) in &results {
+    println!("problem_{}(): {}, {:.2}%",p,t,t*100_f64/total);
+  }
+
+  results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap() );
+  println!("\n\nWorst 10:");
+  for &(p,t) in &results[0..10] {
     println!("problem_{}(): {}, {:.2}%",p,t,t*100_f64/total);
   }
 }
