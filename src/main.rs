@@ -10,9 +10,42 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  assert_eq!(problem_43(),ANSWERS[43]);
+  assert_eq!(problem_44(),ANSWERS[44]);
   //println!("Result: {:b}", 585);
   println!("Great work, team!");
+}
+
+fn problem_44() -> i64 {
+  let mut pentagonals = vec!();
+  for n in 1..10_000_i64 {
+    pentagonals.push(n.checked_mul(3 * n - 1).unwrap() / 2);
+  }
+  println!("{:?}",&pentagonals[0..10]);
+  let mut best = (0,1_000_000_000);
+
+  for j in 1..pentagonals.len()-1 {
+    let p_j = pentagonals[j];
+    for k in j+1..pentagonals.len() {
+      let p_k = pentagonals[k];
+
+      // DO THIS EVEN IF DIFF AND SUM ARE NOT PENTAGONAL
+      if p_k - p_j > best.1 - best.0 {
+        break;
+      }
+
+      if let Err(_) = pentagonals.binary_search(&(p_k - p_j)) {
+        continue;
+      }
+
+      if let Err(_) = pentagonals.binary_search(&(p_k + p_j)) {
+        continue;
+      }
+
+      best = (p_j,p_k);
+    }
+  }
+
+  best.1 - best.0
 }
 
 //slower cause of starting at 0
