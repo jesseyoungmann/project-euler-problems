@@ -10,9 +10,94 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  assert_eq!(problem_45(),ANSWERS[45]);
+  assert_eq!(problem_47(),ANSWERS[47]);
   //println!("Result: {:b}", 585);
   println!("Great work, team!");
+}
+
+// Find the first four consecutive integers to have four distinct prime factors each. What is the first of these numbers?
+fn problem_47() -> i64 {
+  // if a number has 4, start the count, if a number doesn't, reset the count to 0, if count == 4, break and return best
+
+  let mut prime_g = Primes::new();
+  let mut primes = vec!();
+  primes.push(prime_g.next().unwrap());
+
+  let mut best = (0,0);
+
+  for n in 1.. {
+    while n > primes[primes.len()-1] {
+      primes.push(prime_g.next().unwrap());
+    }
+
+    let check = 4;
+
+    let mut x = n;
+    let mut prime_factors = 0;
+    for &prime in &primes {
+      let mut yeah = false;
+      while x % prime == 0 {
+        x /= prime;
+        yeah = true;
+      }
+      if yeah {
+        prime_factors += 1;
+      }
+      if x == 1 { break; }
+    }
+
+    if prime_factors == check {
+      if best.0 == 0 {
+        best = (n,1);
+      } else {
+        best.1 += 1;
+      }
+    } else {
+      best = (0,0);
+    }
+
+    if best.1 == check {
+      return best.0;
+    }
+  }
+  unreachable!();
+}
+
+
+fn problem_46() -> i64 {
+  // for each odd composite number (iterate by 2, start at 3), throw away if it is prime
+  // if not,
+  // for each prime smaller than it, subtract that prime
+  // CHECK IF IT IS ODD, OTHERWISE TOSSING
+  let mut prime_g = Primes::new();
+  let mut primes = vec!();
+  prime_g.next(); // throw away 2
+  primes.push(prime_g.next().unwrap());
+
+  'outer: for n in 1.. {
+    let n = n * 2 + 1;
+
+    while n > primes[primes.len()-1] {
+      primes.push(prime_g.next().unwrap());
+    }
+
+    if let Ok(_) = primes.binary_search(&n) {
+      continue;
+    }
+
+    for &prime in &primes {
+      if prime >= n { break; }
+
+      let mut x = n - prime;
+      if x % 2 != 0 { continue; }
+      x /= 2;
+      if ((x as f64).sqrt() as i64).pow(2) == x {
+        continue 'outer;
+      }
+    }
+    return n;
+  }
+  unreachable!();
 }
 
 fn problem_45() -> i64 {
