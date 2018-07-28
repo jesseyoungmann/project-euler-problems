@@ -46,28 +46,43 @@ fn problem_47() -> i64 {
 
   let mut best = (0,0);
 
-  for n in 1.. {
+  use std::collections::HashMap;
+  // num => number_of_distinct_prime_factors
+  type HelperMap = HashMap<i64,usize>;
+  let mut memo : HelperMap = HashMap::new();
+  memo.insert(1,0);
+
+  let check = 4;
+
+  for n in 2.. {
     while n > primes[primes.len()-1] {
       primes.push(prime_g.next().unwrap());
     }
 
-    let check = 4;
-
-    let mut x = n;
-    let mut prime_factors = 0;
-    for &prime in &primes {
-      let mut yeah = false;
-      while x % prime == 0 {
-        x /= prime;
-        yeah = true;
+    let mut distinct_pf = 0;
+    if n == primes[primes.len()-1] {
+      distinct_pf = 1;
+      memo.insert(n,distinct_pf);
+    } else {
+      let mut x = n;
+      for &prime in &primes {
+        if x % prime == 0 {
+          x /= prime;
+          if let Some(&dpf) = memo.get(&x) {
+            distinct_pf = dpf;
+            if x % prime != 0 {
+              distinct_pf += 1;
+            }
+            memo.insert(n,distinct_pf);
+            break;
+          } else {
+            panic!("WTF MAN, IT SHOULD EXIST: {}",x);
+          }
+        }
       }
-      if yeah {
-        prime_factors += 1;
-      }
-      if x == 1 { break; }
     }
 
-    if prime_factors == check {
+    if distinct_pf == check {
       if best.0 == 0 {
         best = (n,1);
       } else {
