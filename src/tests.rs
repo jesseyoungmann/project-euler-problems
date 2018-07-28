@@ -54,6 +54,7 @@ fn problems() -> Vec<(usize,Box<Fn()->i64>)> {
     (45, Box::new(problem_45)),
     (46, Box::new(problem_46)),
     (47, Box::new(problem_47)),
+    (48, Box::new(problem_48)),
     ]
     //,=> problem_17()),
     //,=> problem_26()),

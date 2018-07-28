@@ -10,9 +10,30 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  assert_eq!(problem_47(),ANSWERS[47]);
+  assert_eq!(problem_48(),ANSWERS[48]);
   //println!("Result: {:b}", 585);
   println!("Great work, team!");
+}
+
+fn problem_48() -> i64 {
+  fn chop_mul(a: u64, b: u64) -> u64 {
+    let chop = 10_u64.pow(16);
+    (a % chop) * (b %chop)
+  }
+
+  fn chop_add(a: u64, b: u64) -> u64 {
+    let chop = 10_u64.pow(16);
+    (a % chop) + (b %chop)
+  }
+  let mut result = 0;
+  for i in 1..1001 {
+    let mut val = i;
+    for _ in 0..i-1 {
+      val = chop_mul(val,i);
+    }
+    result = chop_add(result,val);
+  }
+  (result % 10_u64.pow(10)) as i64
 }
 
 // Find the first four consecutive integers to have four distinct prime factors each. What is the first of these numbers?
