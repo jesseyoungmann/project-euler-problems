@@ -1387,11 +1387,15 @@ fn problem_22() -> i64 {
 }
 
 fn problem_21() -> i64 {
+  let primes = Primes::new().take_while(|&p| p < 10_000).collect::<Vec<i64>>();
+  let mut reuse = vec!();
 
   let mut memo : Vec<usize> = vec![0;10_000];
 
-  for i in 2_usize..10_000 {
-    memo[i] = sum_of_proper_divisors(i);
+  for i in 2..10_000 {
+    properest_divisors(i as i64,&primes,&mut reuse);
+    let val = reuse.iter().sum::<i64>();
+    memo[i] = val as usize - i;
   }
 
   let mut result = 0;
