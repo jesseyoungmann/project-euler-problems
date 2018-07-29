@@ -10,7 +10,7 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  assert_eq!(problem_50(),ANSWERS[50]);
+  assert_eq!(problem_12(),ANSWERS[12]);
   //println!("Result: {:b}", 585);
   println!("Great work, team!");
 }
@@ -1312,7 +1312,6 @@ fn divisor_tree(max: usize) -> Vec<Vec<usize>> {
   result
 }
 
-
 //fn properest_divisors(num: i64, primes: &Vec<i64>, reuse: &mut Vec<i64>) -> i64 {
 fn properest_divisors(num: i64, primes: &Vec<i64>, results: &mut Vec<i64>) {
   results.clear();
@@ -1342,6 +1341,26 @@ fn properest_divisors(num: i64, primes: &Vec<i64>, results: &mut Vec<i64>) {
   }
   //results.sort_unstable();
   //results
+}
+
+fn properest_divisors_count(num: i64, primes: &Vec<i64>) -> i64 {
+  let mut num = num;
+  let mut count = 1;
+
+  for &prime in primes {
+    if num == 1 { break; }
+
+    // HOW TO HANDLE PRIME POWERS? ONLY START AT THE NEW ONES?
+    // anything you've already multiplied 2 by is used
+    let len = count;
+
+    while num % prime == 0 {
+      num = num / prime;
+
+      count += len;
+    }
+  }
+  count
 }
 
 fn problem_22() -> i64 {
@@ -1638,10 +1657,18 @@ fn problem_12() -> i64 {
   let mut num = 1;
   let mut i = 2;
 
+  let mut prime_g = Primes::new();
+  let mut primes = vec!();
+  primes.push(prime_g.next().unwrap());
+
   loop {
     num += i;
 
-    if num_divisors(num) > 500 {
+    while num > primes[primes.len()-1].pow(2) {
+      primes.push(prime_g.next().unwrap());
+    }
+
+    if properest_divisors_count(num,&primes) > 500 {
       break;
     }
 
@@ -1727,9 +1754,7 @@ fn problem_11() -> i64 {
 
 // Probably not improvable? Just gotta do the actual work of calculating primes
 fn problem_10() -> i64 {
-  let result : i64 = Primes::new().take_while( |&x| x < 2_000_000 ).sum();
-
-  result
+  Primes::new().take_while( |&x| x < 2_000_000 ).sum()
 }
 
 // - - - - - - - - - - - - - - - - - - - -
@@ -1901,6 +1926,7 @@ struct Primes {
   found_primes: Vec<i64>
 }
 
+// Doing prime.pow(2) instead of max_prime = sqrt doesn't seem to make a difference
 impl Primes {
   fn new() -> Primes {
     Primes { test_next: 2, found_primes: vec![] }
@@ -1921,6 +1947,8 @@ impl Primes {
   }
 }
 
+const MAX_PRIME : i64 = std::i64::MAX / 2;
+
 impl Iterator for Primes {
   type Item = i64;
   fn next(&mut self) -> Option<Self::Item> {
@@ -1931,7 +1959,7 @@ impl Iterator for Primes {
 
     while !Primes::is_prime(&self.found_primes,self.test_next) {
       self.test_next += 2;
-      if self.test_next > std::i64::MAX / 2 {
+      if self.test_next > MAX_PRIME {
         println!("Max Prime!");
         return None
       }

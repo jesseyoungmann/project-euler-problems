@@ -90,6 +90,8 @@ fn benchmark_all() {
     println!("problem_{}(): {}, {:.2}%",p,t,t*100_f64/total);
   }
 
+  println!("\nTotal time:   {}",total);
+
   results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap() );
   println!("\n\nWorst 10:");
   for &(p,t) in &results[0..10] {
