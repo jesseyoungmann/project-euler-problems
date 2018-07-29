@@ -10,9 +10,74 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  assert_eq!(problem_49(),ANSWERS[49]);
+  assert_eq!(problem_50(),ANSWERS[50]);
   //println!("Result: {:b}", 585);
   println!("Great work, team!");
+}
+
+// Using a vec of bools instead of binary search didn't make a diff, huh
+fn problem_50() -> i64 {
+  let primes : Vec<i64> = Primes::new().take_while( |&p| p < 1_000_000 ).collect();
+  let max = primes[primes.len()-1];
+
+  // (prime, len)
+  // We know 41, with len 6, from problem specification
+  let mut len = 0;
+  let mut sum = 0;
+  for &prime in &primes {
+    sum += prime;
+    if sum > max {
+      sum -= prime;
+      break;
+    }
+    len += 1;
+  }
+
+  let mut global_sum = sum;
+  loop {
+    let mut start = 0;
+    sum = global_sum;
+    //println!("sum: {}",sum);
+    while sum <= max  {
+      if let Ok(_) = primes.binary_search(&sum) {
+        return sum;
+      }
+
+      sum += primes[start+len];
+      sum -= primes[start];
+      start += 1;
+    }
+
+    global_sum -= primes[len-1];
+    len -= 1;
+  }
+}
+
+fn old_problem_50() -> i64 {
+  let primes : Vec<i64> = Primes::new().take_while( |&p| p < 1_000_000 ).collect();
+  let max = primes[primes.len()-1];
+
+  // (prime, len)
+  // We know 41, with len 6, from problem specification
+  let mut best : (i64, usize) = (41,6);
+  'outer: for i in 0..primes.len()-1 {
+    let mut sum = primes[i];
+    let mut c = 1;
+    for j in i+1..primes.len() {
+      sum += primes[j];
+      c += 1;
+      if sum > max { continue 'outer; }
+      if c <= best.1 { continue; }
+      // Huh, binary_searching only the remaining subset of primes
+      // is consistently slightly slower - overhead of creating a slice?
+      if let Ok(_) = primes.binary_search(&sum) {
+        if c > best.1 {
+          best = (sum, c);
+        }
+      }
+    }
+  }
+  best.0
 }
 
 fn problem_49() -> i64 {
