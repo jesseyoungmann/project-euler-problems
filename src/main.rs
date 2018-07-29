@@ -10,9 +10,58 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  assert_eq!(problem_48(),ANSWERS[48]);
+  assert_eq!(problem_49(),ANSWERS[49]);
   //println!("Result: {:b}", 585);
   println!("Great work, team!");
+}
+
+fn problem_49() -> i64 {
+  let primes : Vec<i64> = Primes::new().skip_while( |&p| p < 1_000 ).take_while( |&p| p < 10_000 ).collect();
+
+  let mut reuse = vec!();
+
+  // CAN ASSUME 'prime' IS THE SMALLEST, CAUSE WE'LL HIT IT FIRST
+  // SO IF ANY PERMUTATIONS ARE PRIME BUT ARE SMALLER, BREAK
+  'outer: for &prime in &primes {
+    reuse.clear();
+    for perm in Permuter::new(digits(prime)) {
+      let p = from_digits_i8(&perm);
+      if p == 1487 {
+        continue 'outer;
+      }
+      if p == prime || p < 1000 {
+        continue;
+      }
+      if let Ok(_) = primes.binary_search(&p) {
+        reuse.push(p);
+      }
+    }
+
+    // so we got some primes maybe
+    // make them unique?
+    reuse.sort_unstable();
+    reuse.dedup();
+
+    if reuse.len() < 2 {
+      continue;
+    }
+
+    // SKIP THE LAST ONE
+    for &p in &reuse[0..reuse.len()-1] {
+      if let Ok(_) = reuse.binary_search(&(p+(p-prime))) {
+        let mut output = vec!();
+        for &p in [prime,p,p+(p-prime)].iter() {
+          let mut digits = digits(p);
+          digits.reverse();
+          for d in digits {
+            output.push(d);
+          }
+        }
+        return from_digits_i8(&output);
+      }
+    }
+  }
+  unreachable!();
 }
 
 fn problem_48() -> i64 {
