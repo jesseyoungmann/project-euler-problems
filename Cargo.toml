@@ -6,3 +6,5 @@ authors = ["jesseyoungmann <jesse.youngmann@gmail.com>"]
 [dependencies]
 
 num = "0.1.37"
+smallvec = "0.6.3"
+bit-vec = "0.5.0"

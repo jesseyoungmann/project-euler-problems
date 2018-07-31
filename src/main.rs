@@ -1,23 +1,28 @@
 #![allow(dead_code)]
 extern crate num;
+#[macro_use]
+extern crate smallvec;
+extern crate bit_vec;
 
 use num::bigint::BigUint;
 use num::bigint::ToBigUint;
 use num::ToPrimitive;
+use smallvec::SmallVec;
+use bit_vec::BitVec;
 
 // Files
 use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-  assert_eq!(problem_12(),ANSWERS[12]);
+  assert_eq!(problem_10(),ANSWERS[10]);
   //println!("Result: {:b}", 585);
   println!("Great work, team!");
 }
 
 // Using a vec of bools instead of binary search didn't make a diff, huh
 fn problem_50() -> i64 {
-  let primes : Vec<i64> = Primes::new().take_while( |&p| p < 1_000_000 ).collect();
+  let primes : Vec<i64> = PrimesSieve::new(1_000_000).collect();
   let max = primes[primes.len()-1];
 
   // (prime, len)
@@ -81,7 +86,7 @@ fn old_problem_50() -> i64 {
 }
 
 fn problem_49() -> i64 {
-  let primes : Vec<i64> = Primes::new().skip_while( |&p| p < 1_000 ).take_while( |&p| p < 10_000 ).collect();
+  let primes : Vec<i64> = PrimesSieve::new(10_000).skip_while( |&p| p < 1_000 ).collect();
 
   let mut reuse = vec!();
 
@@ -89,7 +94,7 @@ fn problem_49() -> i64 {
   // SO IF ANY PERMUTATIONS ARE PRIME BUT ARE SMALLER, BREAK
   'outer: for &prime in &primes {
     reuse.clear();
-    for perm in Permuter::new(digits(prime)) {
+    for perm in Permuter::new(digits(prime).into_vec()) {
       let p = from_digits_i8(&perm);
       if p == 1487 {
         continue 'outer;
@@ -945,13 +950,13 @@ fn problem_30() -> i64 {
   result
 }
 
-fn digits(num: i64) -> Vec<i8> {
+fn digits(num: i64) -> SmallVec<[i8;12]> {
   let mut num = num;
   if num == 0 {
-    return vec![0]
+    return smallvec![0]
   }
 
-  let mut digits : Vec<i8> = Vec::new();
+  let mut digits : SmallVec<[i8;12]> = SmallVec::new();
 
   while num > 0 {
     let rem = num % 10;
@@ -1758,7 +1763,7 @@ fn problem_11() -> i64 {
 
 // Probably not improvable? Just gotta do the actual work of calculating primes
 fn problem_10() -> i64 {
-  Primes::new().take_while( |&x| x < 2_000_000 ).sum()
+  PrimesSieve::new(2_000_000).sum()
 }
 
 // - - - - - - - - - - - - - - - - - - - -
@@ -1923,6 +1928,48 @@ fn problem_3() -> i64 {
   }
 
   result
+}
+struct PrimesSieve {
+  bits: BitVec,
+  index: usize
+}
+
+impl PrimesSieve {
+  fn new(max: usize) -> Self {
+    let mut bits = BitVec::from_elem(max,true);
+    bits.set(0,false);
+    bits.set(1,false);
+    Self {
+      bits: bits,
+      index: 2
+    }
+  }
+}
+
+// TODO: SKIP ALL 2's
+impl Iterator for PrimesSieve {
+  type Item = i64;
+  fn next(&mut self) -> Option<Self::Item> {
+    if self.index >= self.bits.len() {
+      return None;
+    }
+
+    let result = self.index as i64;
+
+    let mut i = self.index;
+    i += self.index;
+    while i < self.bits.len() {
+      self.bits.set(i,false);
+      i += self.index;
+    }
+
+    self.index += 1;
+    while self.index < self.bits.len() && !self.bits.get(self.index).unwrap() {
+      self.index += 1;
+    }
+
+    Some(result)
+  }
 }
 
 struct Primes {
