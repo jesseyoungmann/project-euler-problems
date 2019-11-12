@@ -15,10 +15,10 @@ use std::io::prelude::*;
 
 mod answers;
 #[allow(unused_imports)]
-use answers::ANSWERS;
+use crate::answers::ANSWERS;
 
 mod primes;
-use primes::{ PrimesSieve, Primes };
+use crate::primes::{ PrimesSieve, Primes };
 
 fn main() {
   //assert_eq!(problem_10(),ANSWERS[10]);
@@ -363,7 +363,7 @@ fn problem_43() -> i64 {
 fn problem_42() -> i64 {
   let mut triangle_numbers = vec!();
   for n in 1..10_000 {
-    triangle_numbers.push( (n * (n+1) / 2) );
+    triangle_numbers.push( n * (n+1) / 2 );
   }
   let triangle_word = |word: &str| {
     let mut sum = 0;
@@ -1107,7 +1107,6 @@ fn problem_26() -> i64 {
   'outer: for num in 2..1000 {
   //'outer: for num in 13..14 {
     pattern.clear();
-    let mut num = num;
     let mut rem = 1;
 
     // Skip any pre-pattern shit
